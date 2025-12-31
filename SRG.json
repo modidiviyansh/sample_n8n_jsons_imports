@@ -1,0 +1,272 @@
+{
+  "name": "School Report Generator - Complete",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "school-report-generate",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "school-report-webhook"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract and transform incoming data\nconst body = $input.item.json.body;\n\n// Extract form responses\nconst formResponses = body.form_responses || [];\nconst schoolName = formResponses.find(q => q.question_number === 1)?.response || \"Unknown School\";\nconst fees = formResponses.find(q => q.question_number === 2)?.response_label || \"Not provided\";\nconst travelTime = formResponses.find(q => q.question_number === 3)?.response || \"Not provided\";\nconst activities = formResponses.find(q => q.question_number === 4)?.selected_activities || [];\nconst hasAC = formResponses.find(q => q.question_number === 5)?.response || \"No\";\nconst classExcitement = formResponses.find(q => q.question_number === 6)?.response || 5;\nconst learningEnv = formResponses.find(q => q.question_number === 7)?.response || 5;\n\n// Extract comparison scores\nconst categories = [\n  { \n    name: \"Teaching Quality\", \n    our: body.our_score1 || 0, \n    gcm: body.other_score1 || 0,\n    difference: (body.our_score1 || 0) - (body.other_score1 || 0)\n  },\n  { \n    name: \"Facilities\", \n    our: body.our_score2 || 0, \n    gcm: body.other_score2 || 0,\n    difference: (body.our_score2 || 0) - (body.other_score2 || 0)\n  },\n  { \n    name: \"Activities\", \n    our: body.our_score3 || 0, \n    gcm: body.other_score3 || 0,\n    difference: (body.our_score3 || 0) - (body.other_score3 || 0)\n  },\n  { \n    name: \"Environment\", \n    our: body.our_score4 || 0, \n    gcm: body.other_score4 || 0,\n    difference: (body.our_score4 || 0) - (body.other_score4 || 0)\n  },\n  { \n    name: \"Student Support\", \n    our: body.our_score5 || 0, \n    gcm: body.other_score5 || 0,\n    difference: (body.our_score5 || 0) - (body.other_score5 || 0)\n  }\n];\n\n// Prepare structured data\nconst structuredData = {\n  timestamp: new Date().toISOString(),\n  school_name: schoolName,\n  comparison_school: body.others_name || \"GCM Convent School\",\n  mobile_number: body.mobile_number,\n  \n  // Scores\n  our_school_score: body.overall_score_our || 0,\n  gcm_score: body.overall_score_others || 0,\n  score_difference: (body.overall_score_our || 0) - (body.overall_score_others || 0),\n  \n  // Categories\n  categories: categories,\n  \n  // Growth metrics\n  happiness_difference: body.happiness_difference || 0,\n  ranking_improvement: body.ranking_difference || 0,\n  total_improvement: body.total_improvement_difference || 0,\n  \n  // Form context\n  fees: fees,\n  travel_time: travelTime,\n  activities: activities.join(\", \"),\n  activities_count: activities.length,\n  has_ac: hasAC,\n  class_excitement: classExcitement,\n  learning_environment: learningEnv,\n  \n  // Context for AI\n  school_type: \"rural\",\n  gcm_advantage: \"multi-dimensional excellence\",\n  competition_note: \"Most schools excel in one area, GCM excels in all\",\n  \n  // Raw form data\n  form_responses: formResponses\n};\n\nreturn { json: structuredData };"
+      },
+      "id": "transform-data",
+      "name": "Transform Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "HTTP-Referer",
+              "value": "https://school.coolify.theupliftco.com"
+            },
+            {
+              "name": "X-Title",
+              "value": "GCM School Report Generator"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": []
+        },
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/gemini-flash-1.5-8b\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an empathetic educational consultant specializing in rural Indian schools. Your tone is warm, encouraging, and focuses on growth potential. You understand that most schools excel in one area, but GCM Convent School is a multi-dimensional excellence leader. Always respond in valid JSON format.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Generate a personalized school comparison report for a parent/student from {{ $json.school_name }}.\\n\\n**Current School Details:**\\n- Name: {{ $json.school_name }}\\n- Fees: {{ $json.fees }}\\n- Travel Time: {{ $json.travel_time }}\\n- Activities: {{ $json.activities }} ({{ $json.activities_count }} activities)\\n- AC Available: {{ $json.has_ac }}\\n- Student Excitement Level: {{ $json.class_excitement }}/10\\n- Learning Environment Rating: {{ $json.learning_environment }}/10\\n\\n**Comparison with GCM Convent School:**\\n- Current School Score: {{ $json.our_school_score }}%\\n- GCM Convent Score: {{ $json.gcm_score }}%\\n- Teaching Quality: {{ $json.categories[0].our }}% vs {{ $json.categories[0].gcm }}%\\n- Facilities: {{ $json.categories[1].our }}% vs {{ $json.categories[1].gcm }}%\\n- Activities: {{ $json.categories[2].our }}% vs {{ $json.categories[2].gcm }}%\\n- Environment: {{ $json.categories[3].our }}% vs {{ $json.categories[3].gcm }}%\\n- Student Support: {{ $json.categories[4].our }}% vs {{ $json.categories[4].gcm }}%\\n\\n**Growth Potential at GCM:**\\n- Happiness Increase: +{{ $json.happiness_difference }}%\\n- Ranking Improvement: #{{ $json.ranking_improvement }}\\n- Total Improvement: +{{ $json.total_improvement }}%\\n\\n**Context:** {{ $json.school_name }} is from a rural background. {{ $json.competition_note }}.\\n\\nProvide insights in this EXACT JSON format:\\n{\\n  \\\"executive_summary\\\": \\\"3-4 sentences: Warm overview highlighting current school's strengths and GCM's multi-dimensional advantage\\\",\\n  \\\"category_insights\\\": [\\n    \\\"Teaching Quality: Specific observation comparing scores\\\",\\n    \\\"Facilities: Specific observation comparing scores\\\",\\n    \\\"Activities: Specific observation comparing scores\\\",\\n    \\\"Environment: Specific observation comparing scores\\\",\\n    \\\"Student Support: Specific observation comparing scores\\\"\\n  ],\\n  \\\"growth_potential\\\": \\\"2-3 sentences: Inspiring picture of transformation at GCM\\\",\\n  \\\"personalized_recommendation\\\": \\\"2 sentences: Based on fees, travel time, and satisfaction scores\\\",\\n  \\\"key_strengths_current\\\": [\\\"strength1\\\", \\\"strength2\\\"],\\n  \\\"key_advantages_gcm\\\": [\\\"advantage1\\\", \\\"advantage2\\\", \\\"advantage3\\\"]\\n}\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 1500,\n  \"response_format\": { \"type\": \"json_object\" }\n}",
+        "options": {}
+      },
+      "id": "openrouter-ai",
+      "name": "OpenRouter AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Parse AI response and merge with data\nconst previousData = $input.first().json;\nconst aiResponse = $input.first().json;\n\nlet aiInsights;\ntry {\n  // Parse the AI response\n  const content = aiResponse.choices[0].message.content;\n  aiInsights = JSON.parse(content);\n} catch (error) {\n  // Fallback if parsing fails\n  aiInsights = {\n    executive_summary: \"Your school shows great potential for growth.\",\n    category_insights: [\n      \"Teaching Quality: Room for improvement in pedagogical approaches.\",\n      \"Facilities: Basic infrastructure could be enhanced.\",\n      \"Activities: Limited co-curricular options available.\",\n      \"Environment: Comfortable learning environment.\",\n      \"Student Support: Standard support systems in place.\"\n    ],\n    growth_potential: \"At GCM Convent, students experience comprehensive development across all dimensions.\",\n    personalized_recommendation: \"Based on your current satisfaction levels, GCM Convent offers significant improvement opportunities.\",\n    key_strengths_current: [\"Dedicated staff\", \"Student engagement\"],\n    key_advantages_gcm: [\"Multi-dimensional excellence\", \"Modern facilities\", \"Comprehensive activities\"]\n  };\n}\n\n// Get the original data from Transform Data node\nconst transformData = $('Transform Data').first().json;\n\n// Merge everything\nconst finalData = {\n  ...transformData,\n  ai_insights: aiInsights,\n  processing_status: \"AI insights generated\"\n};\n\nreturn { json: finalData };"
+      },
+      "id": "parse-ai-response",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [840, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Reports",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.timestamp }}",
+            "School_Name": "={{ $json.school_name }}",
+            "Mobile": "={{ $json.mobile_number }}",
+            "Our_Overall_Score": "={{ $json.our_school_score }}",
+            "GCM_Overall_Score": "={{ $json.gcm_score }}",
+            "Teaching_Our": "={{ $json.categories[0].our }}",
+            "Teaching_GCM": "={{ $json.categories[0].gcm }}",
+            "Facilities_Our": "={{ $json.categories[1].our }}",
+            "Facilities_GCM": "={{ $json.categories[1].gcm }}",
+            "Activities_Our": "={{ $json.categories[2].our }}",
+            "Activities_GCM": "={{ $json.categories[2].gcm }}",
+            "Environment_Our": "={{ $json.categories[3].our }}",
+            "Environment_GCM": "={{ $json.categories[3].gcm }}",
+            "Support_Our": "={{ $json.categories[4].our }}",
+            "Support_GCM": "={{ $json.categories[4].gcm }}",
+            "Happiness_Diff": "={{ $json.happiness_difference }}",
+            "Ranking": "={{ $json.ranking_improvement }}",
+            "Total_Improvement": "={{ $json.total_improvement }}",
+            "Executive_Summary": "={{ $json.ai_insights.executive_summary }}",
+            "Growth_Potential": "={{ $json.ai_insights.growth_potential }}",
+            "Recommendation": "={{ $json.ai_insights.personalized_recommendation }}",
+            "Fees": "={{ $json.fees }}",
+            "Travel_Time": "={{ $json.travel_time }}",
+            "Activities_List": "={{ $json.activities }}",
+            "Row_ID": "=PENDING_{{ $json.timestamp }}",
+            "Status": "Pending PDF"
+          }
+        },
+        "options": {}
+      },
+      "id": "google-sheets-append",
+      "name": "Google Sheets Append",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [1040, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOYMENT_ID/exec",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": []
+        },
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"action\": \"generateReport\",\n  \"data\": {{ $json }}\n}",
+        "options": {}
+      },
+      "id": "apps-script-pdf",
+      "name": "Apps Script Generate PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://YOUR_EVOLUTION_API_URL/message/sendMedia/YOUR_INSTANCE_NAME",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": []
+        },
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('Parse AI Response').first().json.mobile_number }}\",\n  \"mediatype\": \"document\",\n  \"mimetype\": \"application/pdf\",\n  \"caption\": \"🎉 *Your School Happiness Report is Ready!*\\n\\nDear {{ $('Parse AI Response').first().json.school_name }} Family,\\n\\nYour detailed comparison with GCM Convent School is here! 📊\\n\\n✨ *Key Highlights:*\\n📈 Happiness Boost: +{{ $('Parse AI Response').first().json.happiness_difference }}%\\n🏆 Ranking: #{{ $('Parse AI Response').first().json.ranking_improvement }}\\n💯 Total Improvement: {{ $('Parse AI Response').first().json.total_improvement }}%\\n\\n{{ $('Parse AI Response').first().json.ai_insights.executive_summary }}\\n\\n📄 Check the attached PDF for complete analysis!\\n\\n---\\n🏫 *Join GCM Convent and unlock your full potential!* 🌟\\n\\n📞 Contact: +91-98765-43210\\n🌐 www.gcmconvent.edu.in\",\n  \"media\": \"{{ $json.pdf_url }}\"\n}",
+        "options": {}
+      },
+      "id": "evolution-whatsapp",
+      "name": "Evolution API WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1440, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"message\": \"Report generated and sent successfully!\",\n  \"school_name\": \"{{ $('Parse AI Response').first().json.school_name }}\",\n  \"mobile\": \"{{ $('Parse AI Response').first().json.mobile_number }}\",\n  \"pdf_url\": \"{{ $('Apps Script Generate PDF').first().json.pdf_url }}\",\n  \"whatsapp_status\": \"{{ $json.status }}\",\n  \"timestamp\": \"{{ $('Parse AI Response').first().json.timestamp }}\"\n}",
+        "options": {}
+      },
+      "id": "response-node",
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1640, 300]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Transform Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Data": {
+      "main": [
+        [
+          {
+            "node": "OpenRouter AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter AI": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets Append",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Append": {
+      "main": [
+        [
+          {
+            "node": "Apps Script Generate PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apps Script Generate PDF": {
+      "main": [
+        [
+          {
+            "node": "Evolution API WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution API WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
