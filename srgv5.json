@@ -1,5 +1,5 @@
 {
-  "name": "School Report - GCM Convent Dirba Comparison",
+  "name": "GCM Dirba - Emotional Impact Report",
   "nodes": [
     {
       "parameters": {
@@ -7,21 +7,21 @@
         "path": "school-report-generate",
         "responseMode": "responseNode"
       },
-      "id": "webhook-node",
+      "id": "webhook-1",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [240, 600]
+      "position": [240, 700]
     },
     {
       "parameters": {
-        "jsCode": "const inputData = $input.item.json;\nconst body = inputData.body || inputData;\n\nconst formResponses = body.form_responses || [];\nconst schoolName = formResponses.find(q => q.question_number === 1)?.response || \"Your Current School\";\nconst fees = formResponses.find(q => q.question_number === 2)?.response_label || \"Not provided\";\nconst travelTime = formResponses.find(q => q.question_number === 3)?.response || \"Not provided\";\nconst activities = formResponses.find(q => q.question_number === 4)?.selected_activities || [];\nconst hasAC = formResponses.find(q => q.question_number === 5)?.response || \"No\";\nconst classExcitement = formResponses.find(q => q.question_number === 6)?.response || 5;\nconst learningEnv = formResponses.find(q => q.question_number === 7)?.response || 5;\n\nconst categories = [\n  { name: \"Teaching Quality\", our: body.our_score1 || 0, gcm: body.other_score1 || 0, difference: (body.our_score1 || 0) - (body.other_score1 || 0) },\n  { name: \"Facilities\", our: body.our_score2 || 0, gcm: body.other_score2 || 0, difference: (body.our_score2 || 0) - (body.other_score2 || 0) },\n  { name: \"Activities\", our: body.our_score3 || 0, gcm: body.other_score3 || 0, difference: (body.our_score3 || 0) - (body.other_score3 || 0) },\n  { name: \"Environment\", our: body.our_score4 || 0, gcm: body.other_score4 || 0, difference: (body.our_score4 || 0) - (body.other_score4 || 0) },\n  { name: \"Student Support\", our: body.our_score5 || 0, gcm: body.other_score5 || 0, difference: (body.our_score5 || 0) - (body.other_score5 || 0) }\n];\n\nconst categoryText = categories.map(c => `${c.name}: Current ${c.our}% vs GCM Dirba ${c.gcm}% (Gap: ${Math.abs(c.difference)}%)`).join('\\n');\n\nreturn {\n  timestamp: new Date().toISOString(),\n  school_name: schoolName,\n  comparison_school: \"GCM Convent School Dirba\",\n  mobile_number: body.mobile_number,\n  our_school_score: body.overall_score_our || 0,\n  gcm_score: body.overall_score_others || 0,\n  score_difference: (body.overall_score_our || 0) - (body.overall_score_others || 0),\n  categories: categories,\n  categories_text: categoryText,\n  happiness_difference: body.happiness_difference || 0,\n  ranking_improvement: body.ranking_difference || 0,\n  total_improvement: body.total_improvement_difference || 0,\n  fees: fees,\n  travel_time: travelTime,\n  activities: activities.join(\", \"),\n  activities_count: activities.length,\n  has_ac: hasAC,\n  class_excitement: classExcitement,\n  learning_environment: learningEnv,\n  form_responses: formResponses,\n  retry_count: body.retry_count || 0,\n  max_retries: 3\n};"
+        "jsCode": "const inputData = $input.item.json;\nconst body = inputData.body || inputData;\n\nconst formResponses = body.form_responses || [];\nconst schoolName = formResponses.find(q => q.question_number === 1)?.response || \"Current School\";\nconst fees = formResponses.find(q => q.question_number === 2)?.response_label || \"Not provided\";\nconst travelTime = formResponses.find(q => q.question_number === 3)?.response || \"Not provided\";\nconst activities = formResponses.find(q => q.question_number === 4)?.selected_activities || [];\nconst hasAC = formResponses.find(q => q.question_number === 5)?.response || \"No\";\nconst classExcitement = formResponses.find(q => q.question_number === 6)?.response || 5;\nconst learningEnv = formResponses.find(q => q.question_number === 7)?.response || 5;\n\nconst categories = [\n  { name: \"Teaching Quality\", our: body.our_score1 || 0, gcm: body.other_score1 || 0, difference: (body.our_score1 || 0) - (body.other_score1 || 0) },\n  { name: \"Facilities\", our: body.our_score2 || 0, gcm: body.other_score2 || 0, difference: (body.our_score2 || 0) - (body.other_score2 || 0) },\n  { name: \"Activities\", our: body.our_score3 || 0, gcm: body.other_score3 || 0, difference: (body.our_score3 || 0) - (body.other_score3 || 0) },\n  { name: \"Environment\", our: body.our_score4 || 0, gcm: body.other_score4 || 0, difference: (body.our_score4 || 0) - (body.other_score4 || 0) },\n  { name: \"Student Support\", our: body.our_score5 || 0, gcm: body.other_score5 || 0, difference: (body.our_score5 || 0) - (body.other_score5 || 0) }\n];\n\nconst categoryText = categories.map(c => `${c.name}: Current ${c.our}% vs GCM ${c.gcm}% (Gap: ${Math.abs(c.difference)}%)`).join('\\n');\n\n// Calculate what child is missing\nconst missingHappiness = body.happiness_difference || 0;\nconst missingQuality = Math.abs((body.overall_score_our || 0) - (body.overall_score_others || 0));\n\nreturn {\n  timestamp: new Date().toISOString(),\n  school_name: schoolName,\n  comparison_school: \"GCM Convent School Dirba\",\n  mobile_number: body.mobile_number,\n  our_school_score: body.overall_score_our || 0,\n  gcm_score: body.overall_score_others || 0,\n  score_difference: (body.overall_score_our || 0) - (body.overall_score_others || 0),\n  categories: categories,\n  categories_text: categoryText,\n  happiness_difference: missingHappiness,\n  ranking_improvement: body.ranking_difference || 0,\n  total_improvement: body.total_improvement_difference || 0,\n  fees: fees,\n  travel_time: travelTime,\n  activities: activities.join(\", \"),\n  activities_count: activities.length,\n  has_ac: hasAC,\n  class_excitement: classExcitement,\n  learning_environment: learningEnv,\n  missing_happiness: missingHappiness,\n  missing_quality: missingQuality,\n  child_losing_daily: `${missingHappiness}% happiness, ${missingQuality}% better education quality`,\n  form_responses: formResponses,\n  retry_count: body.retry_count || 0,\n  max_retries: 3\n};"
       },
-      "id": "transform-node",
+      "id": "transform-1",
       "name": "Transform Data",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 600]
+      "position": [440, 700]
     },
     {
       "parameters": {
@@ -35,18 +35,24 @@
             },
             {
               "id": "a2",
-              "name": "ai_prompt",
-              "value": "=**CONTEXT: School Comparison Report Generator**\n\nYou are analyzing a school comparison between:\n- **Current School:** {{ $json.school_name }}\n- **Target School:** GCM Convent School Dirba\n\n**PURPOSE:** Generate an empathetic executive summary for a PDF report that parents will receive via WhatsApp.\n\n**COMPARISON DATA:**\nOverall Performance:\n- {{ $json.school_name }}: {{ $json.our_school_score }}%\n- GCM Convent Dirba: {{ $json.gcm_score }}%\n- Gap: {{ Math.abs($json.score_difference) }} percentage points\n\nCategory Breakdown:\n{{ $json.categories_text }}\n\nStudent Happiness Potential: +{{ $json.happiness_difference }}% increase at GCM\nSchool Ranking: #{{ $json.ranking_improvement }}\nTotal Improvement Potential: {{ $json.total_improvement }}%\n\n**YOUR TASK:**\nWrite a warm, empathetic 3-4 sentence executive summary that:\n1. Respectfully acknowledges {{ $json.school_name }}'s current efforts and strengths\n2. Clearly explains GCM Convent School Dirba's comprehensive advantage across ALL 5 dimensions (teaching, facilities, activities, environment, support)\n3. Emphasizes that GCM excels in multiple areas simultaneously (not just one specialty)\n4. Provides hopeful, professional tone suitable for parents making education decisions\n\n**TONE:** Warm, respectful, encouraging, professional\n**AVOID:** Sales language, criticism of current school, generic praise\n**OUTPUT:** Only the summary text, no labels or formatting",
+              "name": "system_role",
+              "value": "You are a deeply empathetic educational psychologist who understands the emotional weight of parental decisions. Your role is to help parents see the profound impact of their school choice on their child's daily happiness, confidence, and future. You write with warmth, understanding, and gentle urgency.",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "user_prompt",
+              "value": "=**PARENT'S SITUATION:**\n\nTheir child currently attends: {{ $json.school_name }}\nChild's daily excitement level: {{ $json.class_excitement }}/10\nChild's happiness is {{ $json.missing_happiness }}% lower than it could be at GCM Convent School Dirba\n\n**THE GAP THEY FACE:**\n- Current school: {{ $json.our_school_score }}%\n- GCM Convent Dirba: {{ $json.gcm_score }}%\n- Their child is missing: {{ $json.missing_quality }}% better education quality every single day\n\n**CATEGORY GAPS:**\n{{ $json.categories_text }}\n\n**YOUR TASK:**\n\nWrite 3-4 emotionally resonant sentences for parents that:\n\n1. **Acknowledge with empathy:** Start by recognizing their current school choice was made with love and best intentions\n\n2. **Create gentle guilt/awareness:** Help them realize what their child experiences daily - the {{ $json.missing_happiness }}% happiness gap means their child wakes up less excited, returns home less fulfilled, dreams smaller dreams\n\n3. **Paint the transformation:** Show how GCM Convent School Dirba's excellence across ALL dimensions (not just academics) creates children who are genuinely joyful, confident, and thriving\n\n4. **Inspire action without pressure:** Make them WANT to visit GCM Dirba, not because you're selling, but because they suddenly see their child's potential\n\n**TONE:** Empathetic, gently emotional, parent-to-parent, creates healthy guilt that motivates action, hopeful\n\n**AVOID:** Criticism of current school, aggressive sales tactics, false promises\n\n**HIDE:** Any weaknesses of GCM - only present strengths\n\n**OUTPUT:** Only the 3-4 sentence summary",
               "type": "string"
             }
           ]
         }
       },
-      "id": "task1-node",
+      "id": "task1-1",
       "name": "Task 1 Setup",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.3,
-      "position": [640, 340]
+      "position": [640, 400]
     },
     {
       "parameters": {
@@ -60,18 +66,24 @@
             },
             {
               "id": "a2",
-              "name": "ai_prompt",
-              "value": "=**CONTEXT: School Comparison Report - Quality Analysis**\n\nYou are providing detailed quality-based category analysis for:\n- **Current School:** {{ $json.school_name }}\n- **Comparison School:** GCM Convent School Dirba\n\n**PURPOSE:** Generate specific, measurable insights for each of 5 comparison categories for PDF report.\n\n**CATEGORY SCORES:**\n\n1. **Teaching Quality**\n   - {{ $json.school_name }}: {{ $json.categories[0].our }}%\n   - GCM Dirba: {{ $json.categories[0].gcm }}%\n   - Gap: {{ Math.abs($json.categories[0].difference) }}%\n\n2. **Facilities & Infrastructure**\n   - {{ $json.school_name }}: {{ $json.categories[1].our }}%\n   - GCM Dirba: {{ $json.categories[1].gcm }}%\n   - Gap: {{ Math.abs($json.categories[1].difference) }}%\n\n3. **Co-curricular Activities**\n   - {{ $json.school_name }}: {{ $json.categories[2].our }}% ({{ $json.activities_count }} activities available)\n   - GCM Dirba: {{ $json.categories[2].gcm }}% (12+ activities including swimming, robotics, performing arts)\n   - Gap: {{ Math.abs($json.categories[2].difference) }}%\n\n4. **Learning Environment**\n   - {{ $json.school_name }}: {{ $json.categories[3].our }}%\n   - GCM Dirba: {{ $json.categories[3].gcm }}% (AC classrooms, modern campus)\n   - Gap: {{ Math.abs($json.categories[3].difference) }}%\n\n5. **Student Support Systems**\n   - {{ $json.school_name }}: {{ $json.categories[4].our }}%\n   - GCM Dirba: {{ $json.categories[4].gcm }}%\n   - Gap: {{ Math.abs($json.categories[4].difference) }}%\n\n**YOUR TASK:**\nProvide exactly 5 quality-focused insights (one per category). Each should:\n- Start with category name\n- Reference specific scores\n- Explain what the gap means in practical terms\n- Be one clear, specific sentence\n- Focus on measurable differences\n\n**FORMAT:**\n1. Teaching Quality: [specific observation about pedagogy, class sizes, teacher qualifications]\n2. Facilities: [specific observation about labs, equipment, infrastructure]\n3. Activities: [specific observation about variety, depth, competitive opportunities]\n4. Environment: [specific observation about campus, classrooms, atmosphere]\n5. Student Support: [specific observation about counseling, mentoring, guidance]\n\n**TONE:** Analytical, specific, constructive, fact-based\n**OUTPUT:** Only the 5 insights, each on new line",
+              "name": "system_role",
+              "value": "You are an experienced educational quality analyst who specializes in helping parents understand exactly what their children are experiencing - and missing - in their current school. You write with precision, empathy, and focus on tangible daily experiences.",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "user_prompt",
+              "value": "=**DETAILED CATEGORY ANALYSIS:**\n\n**Current School:** {{ $json.school_name }}\n**Comparison:** GCM Convent School Dirba\n\n**1. TEACHING QUALITY**\n- {{ $json.school_name }}: {{ $json.categories[0].our }}%\n- GCM Dirba: {{ $json.categories[0].gcm }}%\n- Gap: {{ Math.abs($json.categories[0].difference) }}%\n- What this means: Teacher training, class sizes, individual attention, pedagogical methods\n\n**2. FACILITIES**\n- {{ $json.school_name }}: {{ $json.categories[1].our }}%\n- GCM Dirba: {{ $json.categories[1].gcm }}%\n- Gap: {{ Math.abs($json.categories[1].difference) }}%\n- What this means: Science labs, digital classrooms, library resources, sports infrastructure\n\n**3. CO-CURRICULAR ACTIVITIES**\n- {{ $json.school_name }}: {{ $json.categories[2].our }}% ({{ $json.activities_count }} activities: {{ $json.activities || 'Limited' }})\n- GCM Dirba: {{ $json.categories[2].gcm }}% (12+ activities: Swimming, Robotics, Theatre, Music, Sports, Arts, Chess, NCC)\n- Gap: {{ Math.abs($json.categories[2].difference) }}%\n- What this means: Talent discovery, holistic development, competitive opportunities\n\n**4. LEARNING ENVIRONMENT**\n- {{ $json.school_name }}: {{ $json.categories[3].our }}% (AC: {{ $json.has_ac }})\n- GCM Dirba: {{ $json.categories[3].gcm }}% (Fully AC, green campus, modern spaces)\n- Gap: {{ Math.abs($json.categories[3].difference) }}%\n- What this means: Physical comfort, atmosphere, daily learning conditions\n\n**5. STUDENT SUPPORT**\n- {{ $json.school_name }}: {{ $json.categories[4].our }}%\n- GCM Dirba: {{ $json.categories[4].gcm }}%\n- Gap: {{ Math.abs($json.categories[4].difference) }}%\n- What this means: Counseling, mentoring, career guidance, pastoral care\n\n**YOUR TASK:**\n\nWrite exactly 5 insights (one per category) that:\n\n1. Make parents FEEL what their child is missing daily\n2. Use specific, tangible examples (\"your child studies in heat\" vs \"GCM kids learn in AC comfort\")\n3. Show the cumulative effect over years\n4. Focus on child's daily experience, not abstract metrics\n5. Create gentle awareness that builds toward action\n\n**FORMAT:** \n1. Teaching Quality: [Make them see their child in overcrowded class vs small GCM class]\n2. Facilities: [Make them imagine their child's science experiment experience]\n3. Activities: [Make them feel their child's limited talent exploration]\n4. Environment: [Make them sense the daily physical experience]\n5. Support: [Make them worry about who's guiding their child's dreams]\n\n**TONE:** Specific, empathetic, experience-focused, builds gentle urgency\n\n**HIDE:** Any GCM weaknesses\n\n**OUTPUT:** Only the 5 insights, numbered, each 1-2 sentences",
               "type": "string"
             }
           ]
         }
       },
-      "id": "task2-node",
+      "id": "task2-1",
       "name": "Task 2 Setup",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.3,
-      "position": [640, 540]
+      "position": [640, 580]
     },
     {
       "parameters": {
@@ -85,18 +97,24 @@
             },
             {
               "id": "a2",
-              "name": "ai_prompt",
-              "value": "=**CONTEXT: School Comparison Report - Student Experience & Growth**\n\nYou are crafting an inspiring experience narrative for:\n- **Current School:** {{ $json.school_name }}\n- **Target School:** GCM Convent School Dirba\n\n**PURPOSE:** Paint an emotional, tangible picture of student transformation for parents reading PDF report.\n\n**STUDENT EXPERIENCE DATA:**\n\nCurrent Situation at {{ $json.school_name }}:\n- Student Excitement Level: {{ $json.class_excitement }}/10\n- Learning Environment Rating: {{ $json.learning_environment }}/10\n- Available Activities: {{ $json.activities }}\n- AC Classrooms: {{ $json.has_ac }}\n\nProjected Experience at GCM Convent Dirba:\n- Happiness Increase: +{{ $json.happiness_difference }}% (measurable improvement)\n- School Ranking: #{{ $json.ranking_improvement }} in region\n- Total Experience Improvement: {{ $json.total_improvement }}%\n- 12+ diverse activities (swimming, robotics, theatre, sports, music, arts)\n- Modern AC classrooms with smart boards\n- Professional counseling and mentoring\n- State-of-the-art science labs and library\n\n**YOUR TASK:**\nWrite 2-3 emotionally resonant sentences that:\n1. Make the {{ $json.happiness_difference }}% happiness increase tangible and real for parents\n2. Connect happiness to comprehensive development (not just academics)\n3. Paint a vivid picture of daily student experience at GCM Dirba\n4. Show how multi-dimensional excellence (teaching + facilities + activities + environment + support) creates lasting transformation\n5. Help parents visualize their child thriving, excited, and growing\n\n**TONE:** Inspiring, hopeful, emotionally engaging, tangible, parent-focused\n**AVOID:** Abstract concepts, generic statements, empty promises\n**OUTPUT:** Only the 2-3 sentences describing transformation",
+              "name": "system_role",
+              "value": "You are a storytelling expert who helps parents visualize their child's potential transformation. You write vivid, emotional narratives that make parents SEE their child thriving, FEEL their child's joy, and WANT that reality for their family.",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "user_prompt",
+              "value": "=**CHILD'S CURRENT REALITY:**\n\nDaily excitement: {{ $json.class_excitement }}/10\nLearning environment satisfaction: {{ $json.learning_environment }}/10\nActivities: {{ $json.activities || 'Limited options' }}\n\n**WHAT THEY'RE MISSING:**\n\n{{ $json.missing_happiness }}% more daily happiness\n{{ $json.total_improvement }}% better overall experience\nRanking: Could be at #{{ $json.ranking_improvement }} school instead\n\n**YOUR TASK:**\n\nWrite 2-3 sentences that make parents VISUALIZE the transformation:\n\n**Paint the morning scene:** \n- Current: Child reluctantly getting ready, \"Do I have to go?\"\n- GCM Dirba: Child excited, talking about today's robotics project or swimming class\n\n**Paint the evening scene:**\n- Current: Tired, homework feels like burden, limited stories to share\n- GCM Dirba: Energized, sharing discoveries, asking to practice what they learned\n\n**Paint the long-term impact:**\n- Current: Average experience, limited exposure, cautious dreams\n- GCM Dirba: Confident, well-rounded, ambitious, multiple talents discovered\n\nMake them FEEL the {{ $json.missing_happiness }}% happiness gap as:\n- 130 days per year less excited\n- 1,560 hours per year less engaged\n- 6 years of childhood less joyful\n\n**Create urgency through love:** \"Every day at current school is a day they can't get back. Every day at GCM Dirba is a day they'll remember with joy.\"\n\n**TONE:** Vivid, emotional, storytelling, creates beautiful FOMO (fear of missing out on child's happiness)\n\n**HIDE:** Any GCM limitations\n\n**OUTPUT:** Only the 2-3 transformation sentences",
               "type": "string"
             }
           ]
         }
       },
-      "id": "task3-node",
+      "id": "task3-1",
       "name": "Task 3 Setup",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.3,
-      "position": [640, 740]
+      "position": [640, 760]
     },
     {
       "parameters": {
@@ -110,14 +128,20 @@
             },
             {
               "id": "a2",
-              "name": "ai_prompt",
-              "value": "=**CONTEXT: School Comparison Report - Personalized Family Recommendation**\n\nYou are providing practical, personalized advice for:\n- **Family's Current School:** {{ $json.school_name }}\n- **Considering:** GCM Convent School Dirba\n\n**PURPOSE:** Give specific, actionable recommendation based on this family's unique situation for PDF report.\n\n**THIS FAMILY'S SITUATION:**\n\nPractical Constraints:\n- Monthly Fee Budget: {{ $json.fees }}\n- Daily Commute Time: {{ $json.travel_time }}\n\nCurrent Student Experience:\n- Child's Excitement about Classes: {{ $json.class_excitement }}/10\n- Learning Environment Satisfaction: {{ $json.learning_environment }}/10\n- Current Activities Available: {{ $json.activities || 'Limited options' }}\n\nGCM Convent Dirba Opportunity:\n- Total Improvement Potential: {{ $json.total_improvement }}%\n- Happiness Increase: +{{ $json.happiness_difference }}%\n- School Ranking: #{{ $json.ranking_improvement }}\n- Comprehensive Excellence Score: {{ $json.gcm_score }}% vs Current {{ $json.our_school_score }}%\n\n**YOUR TASK:**\nProvide exactly 2 practical, specific sentences:\n\n**Sentence 1:** Explain how GCM Convent School Dirba specifically fits THIS family's practical constraints (their fee range of {{ $json.fees }} and commute time of {{ $json.travel_time }}). Be concrete about logistics.\n\n**Sentence 2:** Explain the specific, measurable value they'll gain - reference the {{ $json.total_improvement }}% improvement across all dimensions and what that means for their child's daily experience, happiness, and future success.\n\n**TONE:** Practical, specific, confident, advisor-like, trustworthy\n**AVOID:** Generic benefits, vague promises, hard selling\n**OUTPUT:** Only the 2 sentences",
+              "name": "system_role",
+              "value": "You are a trusted family advisor who understands both practical constraints and emotional needs. You help parents see that choosing the right school isn't about money - it's about their child's daily joy and lifelong success.",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "user_prompt",
+              "value": "=**THIS FAMILY'S SITUATION:**\n\nFee budget: {{ $json.fees }}\nCommute: {{ $json.travel_time }}\nChild's current excitement: {{ $json.class_excitement }}/10\nChild's environment satisfaction: {{ $json.learning_environment }}/10\n\n**THE OPPORTUNITY:**\n\nImprovement potential: {{ $json.total_improvement }}%\nHappiness gain: +{{ $json.missing_happiness }}%\nQuality gap: {{ $json.missing_quality }}% better education daily\n\n**YOUR TASK:**\n\nWrite exactly 2 sentences:\n\n**Sentence 1 - Practical fit:**\nShow how GCM Dirba fits their {{ $json.fees }} budget and {{ $json.travel_time }} commute. Make it feel achievable, worth prioritizing, an investment not an expense.\n\nExample thinking:\n- \"At {{ $json.fees }}, GCM Dirba is less than a family dinner per day, but gives your child {{ $json.total_improvement }}% better education every single day for 10 years.\"\n- \"The {{ $json.travel_time }} commute becomes quality time when your child is excited to talk about their day, their discoveries, their friends.\"\n\n**Sentence 2 - Emotional value:**\nQuantify what {{ $json.total_improvement }}% improvement means in their child's life. Make them realize this decision impacts:\n- 2,000+ days of childhood\n- Personality formation years\n- Foundation for college and career\n- Happiness they can never buy back later\n\n**Create gentle urgency:** \"Admission spots are limited\" or \"Earlier enrollment means more benefit\"\n\n**TONE:** Practical yet emotional, advisor-like, creates feeling that choosing GCM is obvious/responsible decision\n\n**HIDE:** Any GCM weaknesses\n\n**OUTPUT:** Only the 2 sentences",
               "type": "string"
             }
           ]
         }
       },
-      "id": "task4-node",
+      "id": "task4-1",
       "name": "Task 4 Setup",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.3,
@@ -125,22 +149,45 @@
     },
     {
       "parameters": {
-        "authentication": "serviceAccount",
-        "modelId": {
-          "__rl": true,
-          "value": "gemini-2.0-flash-exp",
-          "mode": "list"
-        },
-        "options": {
-          "temperature": 0.7,
-          "maxOutputTokens": 500
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "task_type",
+              "value": "action_plan",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "system_role",
+              "value": "You are a prescriptive educational strategist who provides specific, actionable recommendations. You analyze gaps and provide concrete steps parents can take - whether they choose GCM Dirba or stay at their current school.",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "user_prompt",
+              "value": "=**SITUATION ANALYSIS:**\n\nCurrent school: {{ $json.school_name }}\nOverall quality: {{ $json.our_school_score }}% vs GCM's {{ $json.gcm_score }}%\n\n**IDENTIFIED GAPS:**\n\n{{ $json.categories_text }}\n\nChild's excitement: {{ $json.class_excitement }}/10\nEnvironment satisfaction: {{ $json.learning_environment }}/10\nActivities available: {{ $json.activities_count }} ({{ $json.activities || 'Limited' }})\n\n**YOUR TASK:**\n\nProvide prescriptive analytics in TWO scenarios:\n\n---\n\n**SCENARIO A: IF THEY CHOOSE GCM CONVENT SCHOOL DIRBA**\n\nWrite 3-4 specific benefits they'll gain:\n\n1. **Immediate happiness boost:** \"Your child will experience {{ $json.missing_happiness }}% higher daily happiness from day one through...\"\n\n2. **Long-term advantages:** Based on ranking #{{ $json.ranking_improvement }} and {{ $json.total_improvement }}% better quality\n\n3. **Specific transformation areas:** Based on their biggest gaps (teaching, facilities, activities, etc.)\n\n4. **Next steps:** \"Visit campus, meet teachers, see facilities, talk to current parents, apply for admission (limited spots)\"\n\n---\n\n**SCENARIO B: IF THEY STAY AT CURRENT SCHOOL**\n\nProvide specific compensating actions for each major gap:\n\n**For Teaching Quality Gap ({{ Math.abs($json.categories[0].difference) }}%):**\n- Action 1: Read GCM Dirba's education blogs to understand modern teaching methods\n- Action 2: Hire private tutor for [specific subjects] to bridge gap\n- Action 3: Check child's homework daily to ensure understanding\n\n**For Facilities Gap ({{ Math.abs($json.categories[1].difference) }}%):**\n- Action 1: Enroll in external science/tech programs\n- Action 2: Buy educational kits for home experiments\n- Action 3: Visit museums, exhibitions regularly\n\n**For Activities Gap ({{ Math.abs($json.categories[2].difference) }}% - only {{ $json.activities_count }} activities):**\n- Action 1: Enroll child in {{ (12 - $json.activities_count) }} additional private classes (swimming, music, sports, etc.)\n- Action 2: Cost: Estimate ₹5,000-10,000/month for private coaching\n- Action 3: Time: Additional 10-15 hours/week of scheduling\n\n**For Environment Gap ({{ Math.abs($json.categories[3].difference) }}%):**\n- Action 1: Create better study environment at home\n- Action 2: Monitor classroom comfort issues\n- Action 3: Advocate for school improvements\n\n**For Support Gap ({{ Math.abs($json.categories[4].difference) }}%):**\n- Action 1: Hire educational counselor separately\n- Action 2: Research career guidance resources online\n- Action 3: Join parenting groups for advice\n\n**Make them realize:** \n\"Compensating for these gaps will cost ₹5,000-10,000/month PLUS 10-15 hours/week of your time PLUS your child still won't get the peer environment, infrastructure, and holistic experience of GCM Dirba.\"\n\n---\n\n**TONE:** Analytical, prescriptive, makes staying seem exhausting/expensive, makes GCM seem obvious/efficient\n\n**STRATEGIC FRAMING:** \n- Choosing GCM = One decision, comprehensive solution\n- Staying = Constant effort, incomplete solution, more expensive long-term\n\n**HIDE:** Any GCM weaknesses\n\n**OUTPUT:** Complete action plan for both scenarios",
+              "type": "string"
+            }
+          ]
         }
       },
-      "id": "ai1-node",
-      "name": "AI Gemini 1",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "id": "task5-1",
+      "name": "Task 5 Setup",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [640, 1120]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "options": {}
+      },
+      "id": "ai1-1",
+      "name": "AI 1 Gemini",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
-      "position": [840, 340],
+      "position": [840, 400],
       "credentials": {
         "googleAiApi": {
           "id": "YOUR_GOOGLE_AI_CREDENTIAL_ID",
@@ -151,21 +198,13 @@
     {
       "parameters": {
         "authentication": "serviceAccount",
-        "modelId": {
-          "__rl": true,
-          "value": "gemini-2.0-flash-exp",
-          "mode": "list"
-        },
-        "options": {
-          "temperature": 0.7,
-          "maxOutputTokens": 1000
-        }
+        "options": {}
       },
-      "id": "ai2-node",
-      "name": "AI Gemini 2",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "id": "ai2-1",
+      "name": "AI 2 Gemini",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
-      "position": [840, 540],
+      "position": [840, 580],
       "credentials": {
         "googleAiApi": {
           "id": "YOUR_GOOGLE_AI_CREDENTIAL_ID",
@@ -176,21 +215,13 @@
     {
       "parameters": {
         "authentication": "serviceAccount",
-        "modelId": {
-          "__rl": true,
-          "value": "gemini-2.0-flash-exp",
-          "mode": "list"
-        },
-        "options": {
-          "temperature": 0.8,
-          "maxOutputTokens": 600
-        }
+        "options": {}
       },
-      "id": "ai3-node",
-      "name": "AI Gemini 3",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "id": "ai3-1",
+      "name": "AI 3 Gemini",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
-      "position": [840, 740],
+      "position": [840, 760],
       "credentials": {
         "googleAiApi": {
           "id": "YOUR_GOOGLE_AI_CREDENTIAL_ID",
@@ -200,16 +231,13 @@
     },
     {
       "parameters": {
-        "model": "google/gemini-2.0-flash-exp:free",
         "options": {
-          "baseURL": "https://openrouter.ai/api/v1",
-          "temperature": 0.7,
-          "maxTokens": 500
+          "baseURL": "https://openrouter.ai/api/v1"
         }
       },
-      "id": "ai4-node",
-      "name": "AI OpenRouter 4",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "id": "ai4-1",
+      "name": "AI 4 OpenRouter",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1,
       "position": [840, 940],
       "credentials": {
@@ -221,43 +249,70 @@
     },
     {
       "parameters": {
-        "jsCode": "// For Gemini Chat Model, output is directly in text format\nconst taskData = $('Task 1 Setup').item.json;\nconst aiResponse = $input.item.json;\n\nlet outputText = '';\n\n// Gemini Chat Model returns text directly or in message format\nif (typeof aiResponse === 'string') {\n  outputText = aiResponse;\n} else if (aiResponse.response) {\n  outputText = aiResponse.response;\n} else if (aiResponse.text) {\n  outputText = aiResponse.text;\n} else if (aiResponse.message && aiResponse.message.content) {\n  outputText = aiResponse.message.content;\n}\n\nreturn {\n  ...taskData,\n  response: outputText.trim(),\n  output: outputText.trim(),\n  text: outputText.trim(),\n  ai_success: outputText.length > 50\n};"
+        "authentication": "serviceAccount",
+        "options": {}
       },
-      "id": "extract1-node",
-      "name": "Extract AI 1",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1040, 340]
+      "id": "ai5-1",
+      "name": "AI 5 Gemini",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [840, 1120],
+      "credentials": {
+        "googleAiApi": {
+          "id": "YOUR_GOOGLE_AI_CREDENTIAL_ID",
+          "name": "Google AI"
+        }
+      }
     },
     {
       "parameters": {
-        "jsCode": "const taskData = $('Task 2 Setup').item.json;\nconst aiResponse = $input.item.json;\n\nlet outputText = '';\n\nif (typeof aiResponse === 'string') {\n  outputText = aiResponse;\n} else if (aiResponse.response) {\n  outputText = aiResponse.response;\n} else if (aiResponse.text) {\n  outputText = aiResponse.text;\n} else if (aiResponse.message && aiResponse.message.content) {\n  outputText = aiResponse.message.content;\n}\n\nreturn {\n  ...taskData,\n  response: outputText.trim(),\n  output: outputText.trim(),\n  text: outputText.trim(),\n  ai_success: outputText.length > 50\n};"
+        "jsCode": "const taskData = $('Task 1 Setup').item.json;\nconst aiResponse = $input.item.json;\n\nlet outputText = '';\n\nif (typeof aiResponse === 'string') {\n  outputText = aiResponse;\n} else if (aiResponse.response) {\n  outputText = aiResponse.response;\n} else if (aiResponse.text) {\n  outputText = aiResponse.text;\n} else if (aiResponse.output) {\n  outputText = aiResponse.output;\n}\n\nreturn {\n  ...taskData,\n  response: outputText.trim(),\n  ai_success: outputText.length > 50\n};"
       },
-      "id": "extract2-node",
-      "name": "Extract AI 2",
+      "id": "extract1-1",
+      "name": "Extract 1",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1040, 540]
+      "position": [1040, 400]
     },
     {
       "parameters": {
-        "jsCode": "const taskData = $('Task 3 Setup').item.json;\nconst aiResponse = $input.item.json;\n\nlet outputText = '';\n\nif (typeof aiResponse === 'string') {\n  outputText = aiResponse;\n} else if (aiResponse.response) {\n  outputText = aiResponse.response;\n} else if (aiResponse.text) {\n  outputText = aiResponse.text;\n} else if (aiResponse.message && aiResponse.message.content) {\n  outputText = aiResponse.message.content;\n}\n\nreturn {\n  ...taskData,\n  response: outputText.trim(),\n  output: outputText.trim(),\n  text: outputText.trim(),\n  ai_success: outputText.length > 50\n};"
+        "jsCode": "const taskData = $('Task 2 Setup').item.json;\nconst aiResponse = $input.item.json;\n\nlet outputText = '';\n\nif (typeof aiResponse === 'string') {\n  outputText = aiResponse;\n} else if (aiResponse.response) {\n  outputText = aiResponse.response;\n} else if (aiResponse.text) {\n  outputText = aiResponse.text;\n} else if (aiResponse.output) {\n  outputText = aiResponse.output;\n}\n\nreturn {\n  ...taskData,\n  response: outputText.trim(),\n  ai_success: outputText.length > 50\n};"
       },
-      "id": "extract3-node",
-      "name": "Extract AI 3",
+      "id": "extract2-1",
+      "name": "Extract 2",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1040, 740]
+      "position": [1040, 580]
     },
     {
       "parameters": {
-        "jsCode": "const taskData = $('Task 4 Setup').item.json;\nconst aiResponse = $input.item.json;\n\nlet outputText = '';\n\nif (typeof aiResponse === 'string') {\n  outputText = aiResponse;\n} else if (aiResponse.response) {\n  outputText = aiResponse.response;\n} else if (aiResponse.text) {\n  outputText = aiResponse.text;\n} else if (aiResponse.message && aiResponse.message.content) {\n  outputText = aiResponse.message.content;\n}\n\nreturn {\n  ...taskData,\n  response: outputText.trim(),\n  output: outputText.trim(),\n  text: outputText.trim(),\n  ai_success: outputText.length > 50\n};"
+        "jsCode": "const taskData = $('Task 3 Setup').item.json;\nconst aiResponse = $input.item.json;\n\nlet outputText = '';\n\nif (typeof aiResponse === 'string') {\n  outputText = aiResponse;\n} else if (aiResponse.response) {\n  outputText = aiResponse.response;\n} else if (aiResponse.text) {\n  outputText = aiResponse.text;\n} else if (aiResponse.output) {\n  outputText = aiResponse.output;\n}\n\nreturn {\n  ...taskData,\n  response: outputText.trim(),\n  ai_success: outputText.length > 50\n};"
       },
-      "id": "extract4-node",
-      "name": "Extract AI 4",
+      "id": "extract3-1",
+      "name": "Extract 3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1040, 760]
+    },
+    {
+      "parameters": {
+        "jsCode": "const taskData = $('Task 4 Setup').item.json;\nconst aiResponse = $input.item.json;\n\nlet outputText = '';\n\nif (typeof aiResponse === 'string') {\n  outputText = aiResponse;\n} else if (aiResponse.response) {\n  outputText = aiResponse.response;\n} else if (aiResponse.text) {\n  outputText = aiResponse.text;\n} else if (aiResponse.output) {\n  outputText = aiResponse.output;\n}\n\nreturn {\n  ...taskData,\n  response: outputText.trim(),\n  ai_success: outputText.length > 50\n};"
+      },
+      "id": "extract4-1",
+      "name": "Extract 4",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [1040, 940]
+    },
+    {
+      "parameters": {
+        "jsCode": "const taskData = $('Task 5 Setup').item.json;\nconst aiResponse = $input.item.json;\n\nlet outputText = '';\n\nif (typeof aiResponse === 'string') {\n  outputText = aiResponse;\n} else if (aiResponse.response) {\n  outputText = aiResponse.response;\n} else if (aiResponse.text) {\n  outputText = aiResponse.text;\n} else if (aiResponse.output) {\n  outputText = aiResponse.output;\n}\n\nreturn {\n  ...taskData,\n  response: outputText.trim(),\n  ai_success: outputText.length > 50\n};"
+      },
+      "id": "extract5-1",
+      "name": "Extract 5",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1040, 1120]
     },
     {
       "parameters": {
@@ -265,33 +320,30 @@
         "combinationMode": "mergeByPosition",
         "options": {}
       },
-      "id": "merge-node",
-      "name": "Merge AI Outputs",
+      "id": "merge-1",
+      "name": "Merge All AI",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 2.1,
-      "position": [1240, 640]
+      "position": [1240, 700]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst originalData = $('Transform Data').first().json;\n\nconst aiInsights = {\n  executive_summary: '',\n  category_insights: [],\n  growth_potential: '',\n  personalized_recommendation: '',\n  generation_method: 'ai',\n  models_used: 0\n};\n\nitems.forEach(item => {\n  const taskType = item.json.task_type;\n  const output = item.json.response || item.json.output || item.json.text || '';\n  const success = item.json.ai_success;\n  \n  if (!output || !success) return;\n  \n  aiInsights.models_used++;\n  \n  switch(taskType) {\n    case 'executive_summary':\n      aiInsights.executive_summary = output.trim();\n      break;\n    case 'category_insights':\n      const insights = output.split('\\n')\n        .filter(line => line.trim().length > 20)\n        .map(line => line.trim())\n        .filter(line => \n          line.match(/^[0-9\\.\\-\\*•]/) || \n          line.toLowerCase().includes('teaching') || \n          line.toLowerCase().includes('facilities') || \n          line.toLowerCase().includes('activit') || \n          line.toLowerCase().includes('environment') || \n          line.toLowerCase().includes('support')\n        );\n      aiInsights.category_insights = insights.slice(0, 5);\n      break;\n    case 'growth_potential':\n      aiInsights.growth_potential = output.trim();\n      break;\n    case 'recommendation':\n      aiInsights.personalized_recommendation = output.trim();\n      break;\n  }\n});\n\n// Fallbacks\nif (!aiInsights.executive_summary) {\n  aiInsights.executive_summary = `${originalData.school_name} has built a solid educational foundation. However, GCM Convent School Dirba offers comprehensive excellence across all five dimensions - teaching quality, modern facilities, diverse activities, inspiring environment, and robust student support. Unlike most schools that specialize in one area, GCM Dirba's multi-dimensional approach creates an ecosystem where students consistently achieve higher happiness levels and academic success.`;\n  aiInsights.generation_method = 'fallback';\n}\n\nif (!aiInsights.category_insights || aiInsights.category_insights.length < 5) {\n  aiInsights.category_insights = [\n    `1. Teaching Quality: With ${originalData.categories[0].our}% vs GCM's ${originalData.categories[0].gcm}%, the ${Math.abs(originalData.categories[0].difference)}% gap reflects GCM Dirba's investment in trained educators, smaller class sizes (max 25 students), and modern pedagogical methods.`,\n    `2. Facilities: The ${Math.abs(originalData.categories[1].difference)}% difference (${originalData.categories[1].our}% vs ${originalData.categories[1].gcm}%) showcases GCM's state-of-the-art science labs, digital classrooms with smart boards, comprehensive library, and modern sports infrastructure.`,\n    `3. Activities: With ${originalData.activities_count} activities currently available vs GCM's 12+ options (including swimming pool, robotics lab, theatre, competitive sports), students gain ${Math.abs(originalData.categories[2].difference)}% more opportunities for holistic development.`,\n    `4. Environment: GCM Dirba's ${originalData.categories[3].gcm}% score reflects fully air-conditioned classrooms, green campus zones, dedicated study areas, and an overall atmosphere designed to inspire daily learning.`,\n    `5. Student Support: The ${Math.abs(originalData.categories[4].difference)}% gap demonstrates GCM's comprehensive support system including professional counselors, personalized academic mentoring, career guidance programs, and dedicated pastoral care.`\n  ];\n}\n\nif (!aiInsights.growth_potential) {\n  aiInsights.growth_potential = `At GCM Convent School Dirba, students experience a remarkable ${originalData.happiness_difference}% increase in daily happiness and school satisfaction. This transformation comes from waking up excited for swimming lessons before school, engaging with robotics projects in state-of-the-art labs, receiving personalized attention in smaller classes, and feeling truly supported by professional counselors who know each student's dreams and challenges. It's not just about better scores - it's about creating an environment where children genuinely love learning and growing every single day.`;\n}\n\nif (!aiInsights.personalized_recommendation) {\n  aiInsights.personalized_recommendation = `Given your family's ${originalData.travel_time} commute time and ${originalData.fees} fee budget, GCM Convent School Dirba is strategically positioned in Dirba to serve your needs while fitting your financial planning. The substantial ${originalData.total_improvement}% improvement potential across all educational dimensions - from teaching excellence to comprehensive student support - represents a meaningful investment that will compound into your child's confidence, capabilities, and future success for years to come.`;\n}\n\nreturn {\n  ...originalData,\n  ai_insights: aiInsights,\n  processing_status: `AI insights generated using ${aiInsights.models_used}/4 models - ${aiInsights.generation_method}`\n};"
+        "jsCode": "const items = $input.all();\nconst originalData = $('Transform Data').first().json;\n\nconst aiInsights = {\n  executive_summary: '',\n  category_insights: [],\n  growth_potential: '',\n  personalized_recommendation: '',\n  action_plan: '',\n  generation_method: 'ai',\n  models_used: 0\n};\n\nitems.forEach(item => {\n  const taskType = item.json.task_type;\n  const output = item.json.response || '';\n  const success = item.json.ai_success;\n  \n  if (!output || !success) return;\n  \n  aiInsights.models_used++;\n  \n  switch(taskType) {\n    case 'executive_summary':\n      aiInsights.executive_summary = output.trim();\n      break;\n    case 'category_insights':\n      const insights = output.split('\\n')\n        .filter(line => line.trim().length > 20)\n        .map(line => line.trim())\n        .filter(line => line.match(/^[0-9\\.]/));\n      aiInsights.category_insights = insights.slice(0, 5);\n      break;\n    case 'growth_potential':\n      aiInsights.growth_potential = output.trim();\n      break;\n    case 'recommendation':\n      aiInsights.personalized_recommendation = output.trim();\n      break;\n    case 'action_plan':\n      aiInsights.action_plan = output.trim();\n      break;\n  }\n});\n\n// Emotional fallbacks\nif (!aiInsights.executive_summary) {\n  aiInsights.executive_summary = `We know you chose ${originalData.school_name} with love and your child's best interests at heart. Yet every day, your child experiences ${originalData.missing_happiness}% less happiness than they could at GCM Convent School Dirba - that's 130 days per year where they wake up less excited, learn less joyfully, and dream smaller dreams. GCM Dirba's excellence across teaching, facilities, activities, environment, and support creates children who don't just perform well academically, but who genuinely love learning, discover hidden talents, and build confidence that lasts a lifetime. The question isn't whether your child deserves this - you already know they do - it's whether you'll give them this gift while they're still young enough for it to shape who they become.`;\n  aiInsights.generation_method = 'fallback';\n}\n\nif (!aiInsights.category_insights || aiInsights.category_insights.length < 5) {\n  aiInsights.category_insights = [\n    `1. Teaching Quality: While your child sits in larger classes at ${originalData.school_name}, GCM Dirba students receive personalized attention in smaller groups (max 25 students), with teachers trained in modern pedagogical methods - meaning your child's questions go unanswered ${Math.abs(originalData.categories[0].difference)}% more often than necessary.`,\n    `2. Facilities: Your child learns science from textbooks; GCM students conduct experiments in state-of-the-art labs with equipment many colleges would envy - the ${Math.abs(originalData.categories[1].difference)}% gap means thousands of hands-on learning moments your child will never experience.`,\n    `3. Activities: With only ${originalData.activities_count} activities available, your child's hidden talents in swimming, robotics, theatre, or music may never be discovered, while GCM's 12+ programs help every child find their passion and excel in it.`,\n    `4. Environment: ${originalData.has_ac === 'No' ? 'Your child studies in heat, losing focus and energy,' : 'While classroom comfort is adequate,'} GCM's fully air-conditioned, aesthetically designed campus with green zones creates an atmosphere where children feel valued, comfortable, and inspired to learn.`,\n    `5. Student Support: Without professional counselors and mentors, your child navigates challenges alone; GCM's comprehensive support system means trained professionals guide their academic journey, emotional growth, and career aspirations - support that builds confident, resilient individuals.`\n  ];\n}\n\nif (!aiInsights.growth_potential) {\n  aiInsights.growth_potential = `Picture this: Your child wakes up tomorrow excited about swimming lessons before school, talks enthusiastically about their robotics project at breakfast, returns home energized rather than exhausted, and asks to practice what they learned instead of being reminded about homework. This isn't a fantasy - it's the daily reality of GCM Convent Dirba students, reflected in that ${originalData.missing_happiness}% happiness difference. Over 10 years of schooling, that's 1,300 days of joy, discovery, and growth your child deserves but isn't experiencing. Every day they spend elsewhere is a day of childhood they can never reclaim.`;\n}\n\nif (!aiInsights.personalized_recommendation) {\n  aiInsights.personalized_recommendation = `At ${originalData.fees} monthly fees and ${originalData.travel_time} commute, GCM Convent School Dirba is more accessible than you might think - less than the cost of weekend entertainment, but providing ${originalData.total_improvement}% better education that compounds over 2,000+ school days into your child's confidence, capabilities, and future success. The ${originalData.travel_time} becomes quality time when your child excitedly shares their discoveries, and GCM's limited admission spots mean waiting could mean missing this opportunity entirely - can you really afford to let your child lose another year of the happiness and growth they deserve?`;\n}\n\nif (!aiInsights.action_plan) {\n  aiInsights.action_plan = `**IF YOU CHOOSE GCM CONVENT SCHOOL DIRBA:**\\n\\nYou make ONE decision that solves everything:\\n- Your child gains ${originalData.missing_happiness}% more daily happiness immediately\\n- Access to 12+ activities without additional costs\\n- Professional counseling and mentoring included\\n- State-of-the-art facilities as part of school\\n- Ranking #${originalData.ranking_improvement} school advantage\\n\\n**Next Steps:** Visit campus this week, meet teachers who'll know your child's name, see facilities firsthand, talk to happy parents, apply now (limited spots).\\n\\n---\\n\\n**IF YOU STAY AT ${originalData.school_name}:**\\n\\nYou'll need to compensate for gaps yourself:\\n\\n**Teaching Gap (${Math.abs(originalData.categories[0].difference)}%):**\\n- Hire private tutors: ₹3,000-5,000/month\\n- Check homework daily: 1-2 hours/day\\n- Read GCM's education blogs to understand modern teaching\\n\\n**Facilities Gap (${Math.abs(originalData.categories[1].difference)}%):**\\n- Enroll in external science programs: ₹2,000/month\\n- Buy educational kits for home: ₹5,000-10,000\\n- Schedule museum visits: Time + cost\\n\\n**Activities Gap (${12 - originalData.activities_count} missing activities):**\\n- Swimming classes: ₹2,000/month\\n- Music/dance: ₹1,500/month\\n- Robotics: ₹3,000/month\\n- Sports coaching: ₹2,000/month\\n- **Total: ₹8,500/month + 10-15 hours/week scheduling**\\n\\n**Environment Gap:**\\n- Create study space at home: ₹10,000+ one-time\\n- Monitor school conditions constantly\\n- Accept your child learns in less-than-ideal conditions\\n\\n**Support Gap:**\\n- Hire educational counselor: ₹2,000/session\\n- Research career guidance yourself: Hours of time\\n- Hope you're making right decisions\\n\\n**REALITY CHECK:** You'll spend ₹15,000-20,000/month PLUS 15-20 hours/week PLUS constant stress AND your child STILL won't get the peer environment, integrated experience, and holistic development of GCM Dirba. \\n\\nIs saving money worth your child's happiness and your constant worry?`;\n}\n\nreturn {\n  ...originalData,\n  ai_insights: aiInsights,\n  processing_status: `Generated with ${aiInsights.models_used}/5 AI models - ${aiInsights.generation_method}`\n};"
       },
-      "id": "compile-node",
-      "name": "Compile Insights",
+      "id": "compile-1",
+      "name": "Compile Report",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1440, 640]
+      "position": [1440, 700]
     },
     {
       "parameters": {
         "conditions": {
-          "options": {
-            "caseSensitive": false
-          },
           "conditions": [
             {
               "id": "c1",
               "leftValue": "={{ $json.ai_insights.models_used }}",
-              "rightValue": 2,
+              "rightValue": 3,
               "operator": {
                 "type": "number",
                 "operation": "largerEqual"
@@ -300,11 +352,11 @@
           ]
         }
       },
-      "id": "check-node",
-      "name": "Check AI Success",
+      "id": "check-1",
+      "name": "Check Success",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1640, 640]
+      "position": [1640, 700]
     },
     {
       "parameters": {
@@ -322,40 +374,40 @@
           ]
         }
       },
-      "id": "retry-node",
-      "name": "Check Retry Limit",
+      "id": "retry-1",
+      "name": "Retry Check",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1840, 840]
+      "position": [1840, 900]
     },
     {
       "parameters": {
         "amount": 2,
         "unit": "minutes"
       },
-      "id": "wait-node",
-      "name": "Wait 2 Minutes",
+      "id": "wait-1",
+      "name": "Wait",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [2040, 940],
-      "webhookId": "retry-wait-webhook"
+      "position": [2040, 1000],
+      "webhookId": "retry-webhook"
     },
     {
       "parameters": {
-        "jsCode": "const data = $input.first().json;\ndata.retry_count = (data.retry_count || 0) + 1;\ndata.processing_status = `Retry ${data.retry_count}/${data.max_retries}`;\nreturn { body: data };"
+        "jsCode": "const data = $input.first().json;\ndata.retry_count = (data.retry_count || 0) + 1;\nreturn { body: data };"
       },
-      "id": "increment-node",
-      "name": "Increment Retry",
+      "id": "increment-1",
+      "name": "Increment",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2240, 940]
+      "position": [2240, 1000]
     },
     {
       "parameters": {
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_SHEET_ID",
+          "value": "YOUR_SHEET_ID",
           "mode": "id"
         },
         "sheetName": {
@@ -367,53 +419,36 @@
           "mappingMode": "defineBelow",
           "value": {
             "Timestamp": "={{ $json.timestamp }}",
-            "School_Name": "={{ $json.school_name }}",
+            "School": "={{ $json.school_name }}",
             "Mobile": "={{ $json.mobile_number }}",
-            "Current_Score": "={{ $json.our_school_score }}",
-            "GCM_Score": "={{ $json.gcm_score }}",
-            "Happiness_Increase": "={{ $json.happiness_difference }}",
-            "Ranking": "={{ $json.ranking_improvement }}",
-            "Total_Improvement": "={{ $json.total_improvement }}",
-            "Executive_Summary": "={{ $json.ai_insights.executive_summary }}",
-            "Category_Insight_1": "={{ $json.ai_insights.category_insights[0] }}",
-            "Category_Insight_2": "={{ $json.ai_insights.category_insights[1] }}",
-            "Category_Insight_3": "={{ $json.ai_insights.category_insights[2] }}",
-            "Category_Insight_4": "={{ $json.ai_insights.category_insights[3] }}",
-            "Category_Insight_5": "={{ $json.ai_insights.category_insights[4] }}",
-            "Growth_Potential": "={{ $json.ai_insights.growth_potential }}",
+            "Happiness_Gap": "={{ $json.missing_happiness }}",
+            "Quality_Gap": "={{ $json.missing_quality }}",
+            "Improvement": "={{ $json.total_improvement }}",
+            "Executive": "={{ $json.ai_insights.executive_summary }}",
+            "Growth": "={{ $json.ai_insights.growth_potential }}",
             "Recommendation": "={{ $json.ai_insights.personalized_recommendation }}",
-            "AI_Method": "={{ $json.ai_insights.generation_method }}",
-            "Models_Used": "={{ $json.ai_insights.models_used }}",
-            "Retry_Count": "={{ $json.retry_count }}",
-            "Status": "Ready for PDF"
+            "Action_Plan": "={{ $json.ai_insights.action_plan }}",
+            "Models": "={{ $json.ai_insights.models_used }}",
+            "Status": "Ready"
           }
         }
       },
-      "id": "sheets-node",
-      "name": "Log to Sheets",
+      "id": "sheets-1",
+      "name": "Log Sheets",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.4,
-      "position": [1840, 440],
+      "position": [1840, 500],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
-          "name": "Google Sheets"
+          "id": "YOUR_SHEETS_ID",
+          "name": "Sheets"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_ID/exec",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
+        "url": "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ { \"action\": \"generateReport\", \"data\": $json } }}",
@@ -421,53 +456,44 @@
           "timeout": 60000
         }
       },
-      "id": "pdf-node",
-      "name": "Generate PDF",
+      "id": "pdf-1",
+      "name": "PDF",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2040, 440]
+      "position": [2040, 500]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://YOUR_EVOLUTION_API_URL/message/sendMedia/YOUR_INSTANCE",
+        "url": "https://YOUR_EVOLUTION_URL/message/sendMedia/YOUR_INSTANCE",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "httpHeaderAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  \"number\": $('Check AI Success').item.json.mobile_number,\n  \"mediatype\": \"document\",\n  \"mimetype\": \"application/pdf\",\n  \"caption\": \"🎉 *Your GCM Convent Dirba Comparison Report*\\n\\nDear \" + $('Check AI Success').item.json.school_name + \" Family,\\n\\nYour detailed school comparison is ready! 📊\\n\\n✨ *Key Highlights:*\\n📈 Student Happiness: +\" + $('Check AI Success').item.json.happiness_difference + \"%\\n🏆 School Ranking: #\" + $('Check AI Success').item.json.ranking_improvement + \"\\n💯 Total Improvement: \" + $('Check AI Success').item.json.total_improvement + \"%\\n\\n\" + $('Check AI Success').item.json.ai_insights.executive_summary.substring(0, 180) + \"...\\n\\n📄 Complete PDF report attached!\\n\\n---\\n🏫 *GCM Convent School Dirba*\\nWhere Excellence Meets Opportunity\\n\\n📞 Contact: +91-98765-43210\\n🌐 www.gcmconventdirba.edu.in\\n📧 admissions@gcmconventdirba.edu.in\\n📍 Dirba, Punjab\",\n  \"media\": $json.pdf_url\n} }}"
+        "jsonBody": "={{ {\n  \"number\": $('Check Success').item.json.mobile_number,\n  \"mediatype\": \"document\",\n  \"mimetype\": \"application/pdf\",\n  \"caption\": \"🎉 Your Child's Future Starts Here\\n\\nDear \" + $('Check Success').item.json.school_name + \" Family,\\n\\nYour personalized GCM Dirba comparison reveals:\\n💔 Missing: \" + $('Check Success').item.json.missing_happiness + \"% daily happiness\\n📈 Potential: +\" + $('Check Success').item.json.total_improvement + \"% better experience\\n🏆 Ranking: #\" + $('Check Success').item.json.ranking_improvement + \" school\\n\\nEvery day counts. Limited seats available.\\n\\n📄 Complete analysis attached\\n\\n🏫 GCM Convent School Dirba\\n📞 +91-98765-43210\\n🌐 gcmconventdirba.edu.in\",\n  \"media\": $json.pdf_url\n} }}"
       },
-      "id": "whatsapp-node",
-      "name": "Send WhatsApp",
+      "id": "whatsapp-1",
+      "name": "WhatsApp",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2240, 440],
+      "position": [2240, 500],
       "credentials": {
         "httpHeaderAuth": {
-          "id": "YOUR_EVOLUTION_API_CREDENTIAL_ID",
-          "name": "Evolution API"
+          "id": "YOUR_EVOLUTION_ID",
+          "name": "Evolution"
         }
       }
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ {\n  \"success\": true,\n  \"message\": \"School comparison report generated and sent!\",\n  \"school_name\": $('Check AI Success').item.json.school_name,\n  \"comparison_school\": \"GCM Convent School Dirba\",\n  \"mobile_number\": $('Check AI Success').item.json.mobile_number,\n  \"pdf_url\": $('Generate PDF').first().json.pdf_url,\n  \"ai_generation\": {\n    \"method\": $('Check AI Success').item.json.ai_insights.generation_method,\n    \"models_used\": $('Check AI Success').item.json.ai_insights.models_used,\n    \"total_models\": 4\n  },\n  \"metrics\": {\n    \"happiness_improvement\": $('Check AI Success').item.json.happiness_difference + \"%\",\n    \"ranking\": \"#\" + $('Check AI Success').item.json.ranking_improvement,\n    \"total_improvement\": $('Check AI Success').item.json.total_improvement + \"%\",\n    \"current_score\": $('Check AI Success').item.json.our_school_score + \"%\",\n    \"gcm_score\": $('Check AI Success').item.json.gcm_score + \"%\"\n  },\n  \"retry_count\": $('Check AI Success').item.json.retry_count,\n  \"timestamp\": $('Check AI Success').item.json.timestamp\n} }}"
+        "responseBody": "={{ {\n  \"success\": true,\n  \"school\": $('Check Success').item.json.school_name,\n  \"happiness_missing\": $('Check Success').item.json.missing_happiness + \"%\",\n  \"quality_missing\": $('Check Success').item.json.missing_quality + \"%\",\n  \"improvement_potential\": $('Check Success').item.json.total_improvement + \"%\",\n  \"pdf_url\": $('PDF').first().json.pdf_url,\n  \"ai_models_used\": $('Check Success').item.json.ai_insights.models_used + \"/5\",\n  \"retries\": $('Check Success').item.json.retry_count,\n  \"message\": \"Emotional impact report generated - drives guilt-free action\"\n} }}"
       },
-      "id": "response-node",
-      "name": "Send Response",
+      "id": "response-1",
+      "name": "Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [2440, 440]
+      "position": [2440, 500]
     }
   ],
   "connections": {
@@ -479,83 +505,91 @@
         {"node": "Task 1 Setup", "type": "main", "index": 0},
         {"node": "Task 2 Setup", "type": "main", "index": 0},
         {"node": "Task 3 Setup", "type": "main", "index": 0},
-        {"node": "Task 4 Setup", "type": "main", "index": 0}
+        {"node": "Task 4 Setup", "type": "main", "index": 0},
+        {"node": "Task 5 Setup", "type": "main", "index": 0}
       ]]
     },
     "Task 1 Setup": {
-      "main": [[{"node": "AI Gemini 1", "type": "main", "index": 0}]]
+      "main": [[{"node": "AI 1 Gemini", "type": "main", "index": 0}]]
     },
     "Task 2 Setup": {
-      "main": [[{"node": "AI Gemini 2", "type": "main", "index": 0}]]
+      "main": [[{"node": "AI 2 Gemini", "type": "main", "index": 0}]]
     },
     "Task 3 Setup": {
-      "main": [[{"node": "AI Gemini 3", "type": "main", "index": 0}]]
+      "main": [[{"node": "AI 3 Gemini", "type": "main", "index": 0}]]
     },
     "Task 4 Setup": {
-      "main": [[{"node": "AI OpenRouter 4", "type": "main", "index": 0}]]
+      "main": [[{"node": "AI 4 OpenRouter", "type": "main", "index": 0}]]
     },
-    "AI Gemini 1": {
-      "main": [[{"node": "Extract AI 1", "type": "main", "index": 0}]]
+    "Task 5 Setup": {
+      "main": [[{"node": "AI 5 Gemini", "type": "main", "index": 0}]]
     },
-    "AI Gemini 2": {
-      "main": [[{"node": "Extract AI 2", "type": "main", "index": 0}]]
+    "AI 1 Gemini": {
+      "main": [[{"node": "Extract 1", "type": "main", "index": 0}]]
     },
-    "AI Gemini 3": {
-      "main": [[{"node": "Extract AI 3", "type": "main", "index": 0}]]
+    "AI 2 Gemini": {
+      "main": [[{"node": "Extract 2", "type": "main", "index": 0}]]
     },
-    "AI OpenRouter 4": {
-      "main": [[{"node": "Extract AI 4", "type": "main", "index": 0}]]
+    "AI 3 Gemini": {
+      "main": [[{"node": "Extract 3", "type": "main", "index": 0}]]
     },
-    "Extract AI 1": {
-      "main": [[{"node": "Merge AI Outputs", "type": "main", "index": 0}]]
+    "AI 4 OpenRouter": {
+      "main": [[{"node": "Extract 4", "type": "main", "index": 0}]]
     },
-    "Extract AI 2": {
-      "main": [[{"node": "Merge AI Outputs", "type": "main", "index": 1}]]
+    "AI 5 Gemini": {
+      "main": [[{"node": "Extract 5", "type": "main", "index": 0}]]
     },
-    "Extract AI 3": {
-      "main": [[{"node": "Merge AI Outputs", "type": "main", "index": 2}]]
+    "Extract 1": {
+      "main": [[{"node": "Merge All AI", "type": "main", "index": 0}]]
     },
-    "Extract AI 4": {
-      "main": [[{"node": "Merge AI Outputs", "type": "main", "index": 3}]]
+    "Extract 2": {
+      "main": [[{"node": "Merge All AI", "type": "main", "index": 1}]]
     },
-    "Merge AI Outputs": {
-      "main": [[{"node": "Compile Insights", "type": "main", "index": 0}]]
+    "Extract 3": {
+      "main": [[{"node": "Merge All AI", "type": "main", "index": 2}]]
     },
-    "Compile Insights": {
-      "main": [[{"node": "Check AI Success", "type": "main", "index": 0}]]
+    "Extract 4": {
+      "main": [[{"node": "Merge All AI", "type": "main", "index": 3}]]
     },
-    "Check AI Success": {
+    "Extract 5": {
+      "main": [[{"node": "Merge All AI", "type": "main", "index": 4}]]
+    },
+    "Merge All AI": {
+      "main": [[{"node": "Compile Report", "type": "main", "index": 0}]]
+    },
+    "Compile Report": {
+      "main": [[{"node": "Check Success", "type": "main", "index": 0}]]
+    },
+    "Check Success": {
       "main": [
-        [{"node": "Log to Sheets", "type": "main", "index": 0}],
-        [{"node": "Check Retry Limit", "type": "main", "index": 0}]
+        [{"node": "Log Sheets", "type": "main", "index": 0}],
+        [{"node": "Retry Check", "type": "main", "index": 0}]
       ]
     },
-    "Check Retry Limit": {
+    "Retry Check": {
       "main": [
-        [{"node": "Wait 2 Minutes", "type": "main", "index": 0}],
-        [{"node": "Log to Sheets", "type": "main", "index": 0}]
+        [{"node": "Wait", "type": "main", "index": 0}],
+        [{"node": "Log Sheets", "type": "main", "index": 0}]
       ]
     },
-    "Wait 2 Minutes": {
-      "main": [[{"node": "Increment Retry", "type": "main", "index": 0}]]
+    "Wait": {
+      "main": [[{"node": "Increment", "type": "main", "index": 0}]]
     },
-    "Increment Retry": {
+    "Increment": {
       "main": [[{"node": "Transform Data", "type": "main", "index": 0}]]
     },
-    "Log to Sheets": {
-      "main": [[{"node": "Generate PDF", "type": "main", "index": 0}]]
+    "Log Sheets": {
+      "main": [[{"node": "PDF", "type": "main", "index": 0}]]
     },
-    "Generate PDF": {
-      "main": [[{"node": "Send WhatsApp", "type": "main", "index": 0}]]
+    "PDF": {
+      "main": [[{"node": "WhatsApp", "type": "main", "index": 0}]]
     },
-    "Send WhatsApp": {
-      "main": [[{"node": "Send Response", "type": "main", "index": 0}]]
+    "WhatsApp": {
+      "main": [[{"node": "Response", "type": "main", "index": 0}]]
     }
   },
   "pinData": {},
   "settings": {
     "executionOrder": "v1"
-  },
-  "staticData": {},
-  "tags": []
+  }
 }
