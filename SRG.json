@@ -1,5 +1,5 @@
 {
-  "name": "School Report Generator - AI Agent Multi-Model",
+  "name": "School Report Generator - Simple Multi-Model",
   "nodes": [
     {
       "parameters": {
@@ -17,7 +17,7 @@
     },
     {
       "parameters": {
-        "functionCode": "// Extract and transform incoming data\nconst body = $input.item.json.body;\n\n// Extract form responses\nconst formResponses = body.form_responses || [];\nconst schoolName = formResponses.find(q => q.question_number === 1)?.response || \"Unknown School\";\nconst fees = formResponses.find(q => q.question_number === 2)?.response_label || \"Not provided\";\nconst travelTime = formResponses.find(q => q.question_number === 3)?.response || \"Not provided\";\nconst activities = formResponses.find(q => q.question_number === 4)?.selected_activities || [];\nconst hasAC = formResponses.find(q => q.question_number === 5)?.response || \"No\";\nconst classExcitement = formResponses.find(q => q.question_number === 6)?.response || 5;\nconst learningEnv = formResponses.find(q => q.question_number === 7)?.response || 5;\n\n// Extract comparison scores\nconst categories = [\n  { \n    name: \"Teaching Quality\", \n    our: body.our_score1 || 0, \n    gcm: body.other_score1 || 0,\n    difference: (body.our_score1 || 0) - (body.other_score1 || 0)\n  },\n  { \n    name: \"Facilities\", \n    our: body.our_score2 || 0, \n    gcm: body.other_score2 || 0,\n    difference: (body.our_score2 || 0) - (body.other_score2 || 0)\n  },\n  { \n    name: \"Activities\", \n    our: body.our_score3 || 0, \n    gcm: body.other_score3 || 0,\n    difference: (body.our_score3 || 0) - (body.other_score3 || 0)\n  },\n  { \n    name: \"Environment\", \n    our: body.our_score4 || 0, \n    gcm: body.other_score4 || 0,\n    difference: (body.our_score4 || 0) - (body.other_score4 || 0)\n  },\n  { \n    name: \"Student Support\", \n    our: body.our_score5 || 0, \n    gcm: body.other_score5 || 0,\n    difference: (body.our_score5 || 0) - (body.other_score5 || 0)\n  }\n];\n\n// Create detailed context for AI\nconst aiContext = `\nSchool Comparison Analysis Request:\n\nCurrent School: ${schoolName}\nComparison School: GCM Convent School\nSchool Type: Rural background\n\nScores Comparison:\n- Teaching Quality: ${categories[0].our}% vs ${categories[0].gcm}% (${categories[0].difference >= 0 ? '+' : ''}${categories[0].difference}%)\n- Facilities: ${categories[1].our}% vs ${categories[1].gcm}% (${categories[1].difference >= 0 ? '+' : ''}${categories[1].difference}%)\n- Activities: ${categories[2].our}% vs ${categories[2].gcm}% (${categories[2].difference >= 0 ? '+' : ''}${categories[2].difference}%)\n- Environment: ${categories[3].our}% vs ${categories[3].gcm}% (${categories[3].difference >= 0 ? '+' : ''}${categories[3].difference}%)\n- Student Support: ${categories[4].our}% vs ${categories[4].gcm}% (${categories[4].difference >= 0 ? '+' : ''}${categories[4].difference}%)\n\nOverall Scores:\n- ${schoolName}: ${body.overall_score_our || 0}%\n- GCM Convent: ${body.overall_score_others || 0}%\n\nGrowth Potential:\n- Happiness Improvement: +${body.happiness_difference || 0}%\n- Ranking Position: #${body.ranking_difference || 0}\n- Total Improvement Potential: ${body.total_improvement_difference || 0}%\n\nStudent Context:\n- Monthly Fees: ${fees}\n- Daily Travel Time: ${travelTime}\n- Current Activities: ${activities.join(', ')}\n- Air Conditioned Classrooms: ${hasAC}\n- Student Excitement (classes): ${classExcitement}/10\n- Learning Environment Rating: ${learningEnv}/10\n\nKey Context:\n- Most competing schools excel in ONE area only\n- GCM Convent excels across ALL dimensions (multi-trade mastery)\n- Rural school background seeking comprehensive development\n`;\n\n// Prepare structured data\nconst structuredData = {\n  timestamp: new Date().toISOString(),\n  school_name: schoolName,\n  comparison_school: body.others_name || \"GCM Convent School\",\n  mobile_number: body.mobile_number,\n  \n  // Scores\n  our_school_score: body.overall_score_our || 0,\n  gcm_score: body.overall_score_others || 0,\n  score_difference: (body.overall_score_our || 0) - (body.overall_score_others || 0),\n  \n  // Categories\n  categories: categories,\n  \n  // Growth metrics\n  happiness_difference: body.happiness_difference || 0,\n  ranking_improvement: body.ranking_difference || 0,\n  total_improvement: body.total_improvement_difference || 0,\n  \n  // Form context\n  fees: fees,\n  travel_time: travelTime,\n  activities: activities.join(\", \"),\n  activities_count: activities.length,\n  has_ac: hasAC,\n  class_excitement: classExcitement,\n  learning_environment: learningEnv,\n  \n  // AI prompt context\n  ai_context: aiContext,\n  \n  // Context for AI\n  school_type: \"rural\",\n  gcm_advantage: \"multi-dimensional excellence\",\n  competition_note: \"Most schools excel in one area, GCM excels in all\",\n  \n  // Raw form data\n  form_responses: formResponses,\n  \n  // Retry tracking\n  retry_count: 0\n};\n\nreturn { json: structuredData };"
+        "functionCode": "// Extract and transform incoming data\nconst body = $input.item.json.body;\n\n// Extract form responses\nconst formResponses = body.form_responses || [];\nconst schoolName = formResponses.find(q => q.question_number === 1)?.response || \"Unknown School\";\nconst fees = formResponses.find(q => q.question_number === 2)?.response_label || \"Not provided\";\nconst travelTime = formResponses.find(q => q.question_number === 3)?.response || \"Not provided\";\nconst activities = formResponses.find(q => q.question_number === 4)?.selected_activities || [];\nconst hasAC = formResponses.find(q => q.question_number === 5)?.response || \"No\";\nconst classExcitement = formResponses.find(q => q.question_number === 6)?.response || 5;\nconst learningEnv = formResponses.find(q => q.question_number === 7)?.response || 5;\n\n// Extract comparison scores\nconst categories = [\n  { \n    name: \"Teaching Quality\", \n    our: body.our_score1 || 0, \n    gcm: body.other_score1 || 0,\n    difference: (body.our_score1 || 0) - (body.other_score1 || 0)\n  },\n  { \n    name: \"Facilities\", \n    our: body.our_score2 || 0, \n    gcm: body.other_score2 || 0,\n    difference: (body.our_score2 || 0) - (body.other_score2 || 0)\n  },\n  { \n    name: \"Activities\", \n    our: body.our_score3 || 0, \n    gcm: body.other_score3 || 0,\n    difference: (body.our_score3 || 0) - (body.other_score3 || 0)\n  },\n  { \n    name: \"Environment\", \n    our: body.our_score4 || 0, \n    gcm: body.other_score4 || 0,\n    difference: (body.our_score4 || 0) - (body.other_score4 || 0)\n  },\n  { \n    name: \"Student Support\", \n    our: body.our_score5 || 0, \n    gcm: body.other_score5 || 0,\n    difference: (body.our_score5 || 0) - (body.other_score5 || 0)\n  }\n];\n\n// Create detailed context for AI\nconst aiContext = `\nSchool Comparison Analysis:\n\nCurrent School: ${schoolName}\nComparison: GCM Convent School\nContext: Rural background, seeking multi-dimensional excellence\n\nScore Comparison:\n- Teaching Quality: ${categories[0].our}% vs ${categories[0].gcm}%\n- Facilities: ${categories[1].our}% vs ${categories[1].gcm}%\n- Activities: ${categories[2].our}% vs ${categories[2].gcm}%\n- Environment: ${categories[3].our}% vs ${categories[3].gcm}%\n- Student Support: ${categories[4].our}% vs ${categories[4].gcm}%\n- Overall: ${body.overall_score_our || 0}% vs ${body.overall_score_others || 0}%\n\nGrowth Potential:\n- Happiness: +${body.happiness_difference || 0}%\n- Ranking: #${body.ranking_difference || 0}\n- Total Improvement: ${body.total_improvement_difference || 0}%\n\nFamily Context:\n- Fees: ${fees}\n- Travel: ${travelTime}\n- Activities: ${activities.join(', ')}\n- AC: ${hasAC}\n- Excitement: ${classExcitement}/10\n- Environment: ${learningEnv}/10\n\nKey: Most schools excel in ONE area. GCM excels in ALL dimensions.\n`;\n\n// Prepare structured data\nconst structuredData = {\n  timestamp: new Date().toISOString(),\n  school_name: schoolName,\n  comparison_school: body.others_name || \"GCM Convent School\",\n  mobile_number: body.mobile_number,\n  \n  // Scores\n  our_school_score: body.overall_score_our || 0,\n  gcm_score: body.overall_score_others || 0,\n  score_difference: (body.overall_score_our || 0) - (body.overall_score_others || 0),\n  \n  // Categories\n  categories: categories,\n  \n  // Growth metrics\n  happiness_difference: body.happiness_difference || 0,\n  ranking_improvement: body.ranking_difference || 0,\n  total_improvement: body.total_improvement_difference || 0,\n  \n  // Form context\n  fees: fees,\n  travel_time: travelTime,\n  activities: activities.join(\", \"),\n  activities_count: activities.length,\n  has_ac: hasAC,\n  class_excitement: classExcitement,\n  learning_environment: learningEnv,\n  \n  // AI prompt context\n  ai_context: aiContext,\n  \n  // Context\n  school_type: \"rural\",\n  gcm_advantage: \"multi-dimensional excellence\",\n  \n  // Raw form data\n  form_responses: formResponses,\n  \n  // Retry tracking\n  retry_count: 0,\n  max_retries: 3\n};\n\nreturn { json: structuredData };"
       },
       "id": "transform-data",
       "name": "Transform Data",
@@ -27,213 +27,130 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
             {
-              "id": "exec_summary_task",
-              "name": "task_type",
-              "value": "executive_summary",
-              "type": "string"
+              "name": "HTTP-Referer",
+              "value": "https://school.coolify.theupliftco.com"
             },
             {
-              "id": "prompt_exec",
-              "name": "prompt",
-              "value": "=You are an empathetic educational consultant for rural Indian schools.\n\nAnalyze this school comparison:\n{{ $json.ai_context }}\n\nProvide a warm, encouraging 3-4 sentence executive summary highlighting:\n1. Current school's key strengths\n2. GCM Convent's multi-dimensional advantage\n3. Overall assessment for parents\n\nTone: Professional yet encouraging, focus on growth opportunity.",
-              "type": "string"
+              "name": "X-Title",
+              "value": "GCM School Report"
             }
           ]
         },
-        "options": {}
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/gemini-2.0-flash-exp:free\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an empathetic educational consultant for rural Indian schools. Generate insights in valid JSON format.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.ai_context }}\\n\\nProvide analysis in this EXACT JSON format:\\n{\\n  \\\"executive_summary\\\": \\\"3-4 sentences highlighting current school strengths and GCM's multi-dimensional advantage\\\",\\n  \\\"category_insights\\\": [\\n    \\\"Teaching Quality: specific observation\\\",\\n    \\\"Facilities: specific observation\\\",\\n    \\\"Activities: specific observation\\\",\\n    \\\"Environment: specific observation\\\",\\n    \\\"Student Support: specific observation\\\"\\n  ],\\n  \\\"growth_potential\\\": \\\"2-3 inspiring sentences about transformation at GCM\\\",\\n  \\\"personalized_recommendation\\\": \\\"2 sentences based on fees ({{ $json.fees }}), travel ({{ $json.travel_time }}), and improvement potential ({{ $json.total_improvement }}%)\\\",\\n  \\\"key_strengths_current\\\": [\\\"strength1\\\", \\\"strength2\\\"],\\n  \\\"key_advantages_gcm\\\": [\\\"advantage1\\\", \\\"advantage2\\\", \\\"advantage3\\\"]\\n}\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 2000,\n  \"response_format\": { \"type\": \"json_object\" }\n}",
+        "options": {
+          "timeout": 30000
+        }
       },
-      "id": "task-1-exec-summary",
-      "name": "Task 1: Executive Summary",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.3,
-      "position": [640, 260]
+      "id": "ai-call-gemini",
+      "name": "AI: Gemini (Primary)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [640, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_OPENROUTER_CREDENTIAL_ID",
+          "name": "OpenRouter API"
+        }
+      },
+      "continueOnFail": true
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
             {
-              "id": "category_task",
-              "name": "task_type",
-              "value": "category_insights",
-              "type": "string"
+              "name": "HTTP-Referer",
+              "value": "https://school.coolify.theupliftco.com"
             },
             {
-              "id": "prompt_category",
-              "name": "prompt",
-              "value": "=You are an educational analyst specializing in school performance metrics.\n\nAnalyze these category comparisons:\n{{ $json.ai_context }}\n\nProvide 5 specific insights (one per category):\n1. Teaching Quality: [specific observation]\n2. Facilities: [specific observation]\n3. Activities: [specific observation]\n4. Environment: [specific observation]\n5. Student Support: [specific observation]\n\nFormat: Bullet points, actionable insights, compare scores directly.",
-              "type": "string"
+              "name": "X-Title",
+              "value": "GCM School Report"
             }
           ]
         },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"meta-llama/llama-3.2-3b-instruct:free\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an educational analyst. Provide school comparison insights in JSON format.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.ai_context }}\\n\\nProvide analysis in this EXACT JSON format:\\n{\\n  \\\"executive_summary\\\": \\\"3-4 sentences\\\",\\n  \\\"category_insights\\\": [\\\"Teaching Quality: ...\\\", \\\"Facilities: ...\\\", \\\"Activities: ...\\\", \\\"Environment: ...\\\", \\\"Student Support: ...\\\"],\\n  \\\"growth_potential\\\": \\\"2-3 sentences\\\",\\n  \\\"personalized_recommendation\\\": \\\"2 sentences\\\",\\n  \\\"key_strengths_current\\\": [\\\"strength1\\\", \\\"strength2\\\"],\\n  \\\"key_advantages_gcm\\\": [\\\"advantage1\\\", \\\"advantage2\\\", \\\"advantage3\\\"]\\n}\"\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 2000,\n  \"response_format\": { \"type\": \"json_object\" }\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "ai-call-llama",
+      "name": "AI: Llama (Backup)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [640, 500],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_OPENROUTER_CREDENTIAL_ID",
+          "name": "OpenRouter API"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
         "options": {}
       },
-      "id": "task-2-category",
-      "name": "Task 2: Category Insights",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.3,
-      "position": [640, 400]
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "growth_task",
-              "name": "task_type",
-              "value": "growth_potential",
-              "type": "string"
-            },
-            {
-              "id": "prompt_growth",
-              "name": "prompt",
-              "value": "=You are an inspiring educational consultant focused on student development.\n\nGrowth Metrics:\n{{ $json.ai_context }}\n\nPaint an inspiring 2-3 sentence picture of transformation at GCM Convent:\n- Focus on the {{ $json.happiness_difference }}% happiness increase\n- Emphasize multi-dimensional development\n- Make it emotionally resonant for parents\n\nTone: Inspiring, hopeful, tangible benefits.",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "task-3-growth",
-      "name": "Task 3: Growth Potential",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.3,
-      "position": [640, 540]
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "recommendation_task",
-              "name": "task_type",
-              "value": "recommendation",
-              "type": "string"
-            },
-            {
-              "id": "prompt_recommendation",
-              "name": "prompt",
-              "value": "=You are a practical education advisor helping parents make decisions.\n\nFamily Context:\n- Fees Budget: {{ $json.fees }}\n- Travel Time: {{ $json.travel_time }}\n- Current Satisfaction: {{ $json.class_excitement }}/10\n- Learning Environment: {{ $json.learning_environment }}/10\n\nImprovement Potential: {{ $json.total_improvement }}%\n\nProvide 2 sentences of personalized recommendation:\n1. Why GCM fits their practical constraints (fees, travel)\n2. The specific value they'll gain\n\nTone: Practical, specific, actionable.",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "task-4-recommendation",
-      "name": "Task 4: Recommendation",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.3,
-      "position": [640, 680]
-    },
-    {
-      "parameters": {
-        "model": "grok-2-1212",
-        "options": {
-          "temperature": 0.7,
-          "maxTokens": 500
-        },
-        "text": "={{ $json.prompt }}",
-        "hasOutputParser": true
-      },
-      "id": "ai-agent-model-1",
-      "name": "AI Model 1: Grok",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
-      "typeVersion": 1,
-      "position": [840, 260],
-      "credentials": {
-        "openRouterApi": {
-          "id": "YOUR_OPENROUTER_CREDENTIAL_ID",
-          "name": "OpenRouter API"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "model": "google/gemini-2.0-flash-exp:free",
-        "options": {
-          "temperature": 0.7,
-          "maxTokens": 500
-        },
-        "text": "={{ $json.prompt }}",
-        "hasOutputParser": true
-      },
-      "id": "ai-agent-model-2",
-      "name": "AI Model 2: Gemini",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
-      "typeVersion": 1,
-      "position": [840, 400],
-      "credentials": {
-        "openRouterApi": {
-          "id": "YOUR_OPENROUTER_CREDENTIAL_ID",
-          "name": "OpenRouter API"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "model": "meta-llama/llama-3.2-3b-instruct:free",
-        "options": {
-          "temperature": 0.7,
-          "maxTokens": 500
-        },
-        "text": "={{ $json.prompt }}",
-        "hasOutputParser": true
-      },
-      "id": "ai-agent-model-3",
-      "name": "AI Model 3: Llama",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
-      "typeVersion": 1,
-      "position": [840, 540],
-      "credentials": {
-        "openRouterApi": {
-          "id": "YOUR_OPENROUTER_CREDENTIAL_ID",
-          "name": "OpenRouter API"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "model": "microsoft/phi-3-mini-128k-instruct:free",
-        "options": {
-          "temperature": 0.7,
-          "maxTokens": 500
-        },
-        "text": "={{ $json.prompt }}",
-        "hasOutputParser": true
-      },
-      "id": "ai-agent-model-4",
-      "name": "AI Model 4: Phi-3",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
-      "typeVersion": 1,
-      "position": [840, 680],
-      "credentials": {
-        "openRouterApi": {
-          "id": "YOUR_OPENROUTER_CREDENTIAL_ID",
-          "name": "OpenRouter API"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "mode": "combineAll"
-      },
-      "id": "merge-ai-results",
-      "name": "Merge AI Results",
+      "id": "merge-ai-responses",
+      "name": "Merge AI Responses",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 2.1,
+      "position": [840, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Compile AI responses with fallback logic\nconst originalData = $('Transform Data').first().json;\nconst geminiResponse = $input.first().json;\nconst llamaResponse = $input.last().json;\n\nlet aiInsights = null;\nlet sourceModel = \"none\";\n\n// Try to parse Gemini response first\nif (geminiResponse && geminiResponse.choices && geminiResponse.choices[0]) {\n  try {\n    const content = geminiResponse.choices[0].message.content;\n    aiInsights = JSON.parse(content);\n    sourceModel = \"gemini\";\n  } catch (error) {\n    console.log('Gemini parsing failed:', error);\n  }\n}\n\n// If Gemini failed, try Llama\nif (!aiInsights && llamaResponse && llamaResponse.choices && llamaResponse.choices[0]) {\n  try {\n    const content = llamaResponse.choices[0].message.content;\n    aiInsights = JSON.parse(content);\n    sourceModel = \"llama\";\n  } catch (error) {\n    console.log('Llama parsing failed:', error);\n  }\n}\n\n// If both failed, use fallback content\nif (!aiInsights) {\n  aiInsights = {\n    executive_summary: `${originalData.school_name} demonstrates solid foundations with particular strength in areas like ${originalData.has_ac === 'Yes, we have AC! 😎' ? 'modern facilities' : 'student engagement'}. However, GCM Convent School offers a comprehensive educational experience with excellence across all dimensions - teaching, facilities, activities, environment, and student support. Unlike most schools that excel in one area, GCM's multi-dimensional approach creates an environment where students thrive academically, socially, and personally.`,\n    \n    category_insights: [\n      `Teaching Quality: Current ${originalData.categories[0].our}% vs GCM ${originalData.categories[0].gcm}% - GCM offers advanced pedagogical approaches, smaller class sizes, and continuous professional development for teachers.`,\n      `Facilities: Current ${originalData.categories[1].our}% vs GCM ${originalData.categories[1].gcm}% - GCM provides state-of-the-art infrastructure including modern science labs, digital classrooms, library, and sports facilities.`,\n      `Activities: Current ${originalData.categories[2].our}% vs GCM ${originalData.categories[2].gcm}% - While your school offers ${originalData.activities_count} activities, GCM provides 12+ diverse options including swimming, robotics, music, arts, and competitive sports.`,\n      `Environment: Current ${originalData.categories[3].our}% vs GCM ${originalData.categories[3].gcm}% - GCM creates inspiring learning spaces with AC classrooms, green zones, and well-maintained campus promoting student well-being.`,\n      `Student Support: Current ${originalData.categories[4].our}% vs GCM ${originalData.categories[4].gcm}% - GCM offers personalized mentoring, counseling services, career guidance, and comprehensive support systems for every student.`\n    ],\n    \n    growth_potential: `At GCM Convent, your child could experience a remarkable ${originalData.happiness_difference}% increase in daily happiness and overall satisfaction. This transformation comes from comprehensive development across academics, co-curricular activities, modern facilities, and strong support systems. Students consistently report feeling more engaged, motivated, and excited about learning - setting them up for long-term success.`,\n    \n    personalized_recommendation: `Given your family's context with ${originalData.travel_time} travel time and ${originalData.fees} fee range, GCM Convent is strategically positioned to serve your needs. The significant ${originalData.total_improvement}% improvement potential across all educational dimensions makes this a valuable investment in your child's comprehensive development and future success.`,\n    \n    key_strengths_current: [\n      originalData.class_excitement >= 6 ? \"Strong student engagement\" : \"Dedicated teaching staff\",\n      originalData.learning_environment >= 7 ? \"Positive learning environment\" : \"Established infrastructure\"\n    ],\n    \n    key_advantages_gcm: [\n      \"Multi-dimensional excellence across all categories\",\n      \"Modern facilities and comprehensive activity programs\",\n      \"Personalized support and holistic development focus\"\n    ],\n    \n    generation_method: \"fallback\"\n  };\n  sourceModel = \"fallback\";\n}\n\n// Validate insights structure\nif (!aiInsights.category_insights || aiInsights.category_insights.length < 5) {\n  aiInsights.category_insights = [\n    `Teaching Quality: Score comparison ${originalData.categories[0].our}% vs ${originalData.categories[0].gcm}%`,\n    `Facilities: Score comparison ${originalData.categories[1].our}% vs ${originalData.categories[1].gcm}%`,\n    `Activities: Score comparison ${originalData.categories[2].our}% vs ${originalData.categories[2].gcm}%`,\n    `Environment: Score comparison ${originalData.categories[3].our}% vs ${originalData.categories[3].gcm}%`,\n    `Student Support: Score comparison ${originalData.categories[4].our}% vs ${originalData.categories[4].gcm}%`\n  ];\n}\n\n// Merge with original data\nconst finalData = {\n  ...originalData,\n  ai_insights: aiInsights,\n  ai_source_model: sourceModel,\n  processing_status: `AI insights generated from ${sourceModel} model`\n};\n\nreturn { json: finalData };"
+      },
+      "id": "compile-insights",
+      "name": "Compile AI Insights",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [1040, 400]
     },
     {
       "parameters": {
-        "functionCode": "// Combine multiple AI model outputs intelligently\nconst items = $input.all();\n\n// Group by task type\nconst taskGroups = {\n  executive_summary: [],\n  category_insights: [],\n  growth_potential: [],\n  recommendation: []\n};\n\nitems.forEach(item => {\n  const taskType = item.json.task_type;\n  const aiOutput = item.json.output || item.json.response || item.json.text || '';\n  \n  if (taskGroups[taskType]) {\n    taskGroups[taskType].push(aiOutput);\n  }\n});\n\n// Function to select best response (longest, most detailed)\nfunction selectBestResponse(responses) {\n  if (responses.length === 0) return '';\n  \n  // Filter out empty responses\n  const validResponses = responses.filter(r => r && r.trim().length > 0);\n  \n  if (validResponses.length === 0) return '';\n  \n  // Return the longest response (usually most detailed)\n  return validResponses.reduce((longest, current) => {\n    return current.length > longest.length ? current : longest;\n  });\n}\n\n// Function to combine multiple insights\nfunction combineInsights(responses) {\n  if (responses.length === 0) return [];\n  \n  // For category insights, try to extract bullet points from all responses\n  const allPoints = [];\n  \n  responses.forEach(response => {\n    // Split by newlines and filter for lines that look like insights\n    const lines = response.split('\\n').filter(line => {\n      const trimmed = line.trim();\n      return trimmed.length > 20 && \n             (trimmed.match(/^[0-9•\\-\\*]/) || trimmed.includes(':'));\n    });\n    allPoints.push(...lines);\n  });\n  \n  // Take top 5 most relevant\n  return allPoints.slice(0, 5).map(point => point.trim());\n}\n\n// Compile final AI insights\nconst aiInsights = {\n  executive_summary: selectBestResponse(taskGroups.executive_summary),\n  category_insights: combineInsights(taskGroups.category_insights),\n  growth_potential: selectBestResponse(taskGroups.growth_potential),\n  personalized_recommendation: selectBestResponse(taskGroups.recommendation),\n  \n  // Metadata\n  models_used: items.length,\n  generation_timestamp: new Date().toISOString()\n};\n\n// Get original data from Transform Data node\nconst originalData = $('Transform Data').first().json;\n\n// Merge everything\nconst finalData = {\n  ...originalData,\n  ai_insights: aiInsights,\n  processing_status: \"AI insights compiled from multiple models\"\n};\n\nreturn { json: finalData };"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-success",
+              "leftValue": "={{ $json.ai_source_model }}",
+              "rightValue": "fallback",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "compile-ai-insights",
-      "name": "Compile AI Insights",
-      "type": "n8n-nodes-base.code",
+      "id": "check-ai-success",
+      "name": "Check AI Success",
+      "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [1240, 400]
     },
@@ -247,12 +164,12 @@
           },
           "conditions": [
             {
-              "id": "check-ai-success",
-              "leftValue": "={{ $json.ai_insights.executive_summary }}",
-              "rightValue": "",
+              "id": "check-retry-count",
+              "leftValue": "={{ $json.retry_count }}",
+              "rightValue": "={{ $json.max_retries }}",
               "operator": {
-                "type": "string",
-                "operation": "notEmpty"
+                "type": "number",
+                "operation": "smaller"
               }
             }
           ],
@@ -260,32 +177,32 @@
         },
         "options": {}
       },
-      "id": "check-ai-success",
-      "name": "Check AI Success",
+      "id": "check-retry-limit",
+      "name": "Check Retry Limit",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1440, 400]
+      "position": [1440, 540]
     },
     {
       "parameters": {
         "amount": 5,
         "unit": "minutes"
       },
-      "id": "wait-5-min",
+      "id": "wait-5-minutes",
       "name": "Wait 5 Minutes",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1640, 540]
+      "position": [1640, 640]
     },
     {
       "parameters": {
-        "functionCode": "// Increment retry count\nconst data = $input.first().json;\n\ndata.retry_count = (data.retry_count || 0) + 1;\n\nif (data.retry_count >= 3) {\n  // Max retries reached, use fallback content\n  data.ai_insights = {\n    executive_summary: `${data.school_name} demonstrates solid foundations across multiple areas. GCM Convent School offers a comprehensive educational experience with excellence across all dimensions - teaching, facilities, activities, environment, and student support. This multi-dimensional approach creates an environment where students thrive academically and personally.`,\n    category_insights: [\n      `Teaching Quality: Current score ${data.categories[0].our}% vs GCM ${data.categories[0].gcm}% - GCM offers advanced pedagogical approaches and smaller class sizes.`,\n      `Facilities: Current score ${data.categories[1].our}% vs GCM ${data.categories[1].gcm}% - GCM provides state-of-the-art infrastructure and modern amenities.`,\n      `Activities: Current score ${data.categories[2].our}% vs GCM ${data.categories[2].gcm}% - GCM offers 12+ diverse co-curricular options for holistic development.`,\n      `Environment: Current score ${data.categories[3].our}% vs GCM ${data.categories[3].gcm}% - GCM creates inspiring learning spaces with modern facilities.`,\n      `Student Support: Current score ${data.categories[4].our}% vs GCM ${data.categories[4].gcm}% - GCM provides personalized mentoring and comprehensive support systems.`\n    ],\n    growth_potential: `At GCM Convent, students experience a ${data.happiness_difference}% increase in daily happiness and satisfaction. The comprehensive approach to education - combining academic excellence, diverse activities, and strong support systems - creates measurable improvements in student performance and well-being.`,\n    personalized_recommendation: `Given your travel time of ${data.travel_time} and fee range of ${data.fees}, GCM Convent is well-positioned to serve your family. The ${data.total_improvement}% improvement potential across all areas makes this a valuable investment in comprehensive education.`,\n    generation_method: \"fallback\"\n  };\n  data.processing_status = \"Using fallback insights after max retries\";\n  \n  return { json: data };\n}\n\ndata.processing_status = `Retry attempt ${data.retry_count}`;\nreturn { json: data };"
+        "functionCode": "// Increment retry count and loop back\nconst data = $input.first().json;\n\ndata.retry_count = (data.retry_count || 0) + 1;\ndata.processing_status = `Retry attempt ${data.retry_count} of ${data.max_retries}`;\n\nreturn { json: data };"
       },
-      "id": "retry-logic",
-      "name": "Retry Logic",
+      "id": "increment-retry",
+      "name": "Increment Retry",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1840, 540]
+      "position": [1840, 640]
     },
     {
       "parameters": {
@@ -327,28 +244,28 @@
             "Fees": "={{ $json.fees }}",
             "Travel_Time": "={{ $json.travel_time }}",
             "Activities_List": "={{ $json.activities }}",
-            "Row_ID": "={{ $json.timestamp }}",
+            "AI_Model": "={{ $json.ai_source_model }}",
             "Status": "Pending PDF"
           }
         },
         "options": {}
       },
-      "id": "google-sheets-append",
-      "name": "Google Sheets Append",
+      "id": "sheets-append",
+      "name": "Google Sheets",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.4,
-      "position": [1640, 260],
+      "position": [1440, 260],
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
-          "name": "Google Sheets Account"
+          "name": "Google Sheets"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOYMENT_ID/exec",
+        "url": "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_ID/exec",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -366,270 +283,99 @@
         }
       },
       "id": "apps-script-pdf",
-      "name": "Apps Script Generate PDF",
+      "name": "Generate PDF",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1840, 260]
+      "position": [1640, 260]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://YOUR_EVOLUTION_API_URL/message/sendMedia/YOUR_INSTANCE_NAME",
+        "url": "https://YOUR_EVOLUTION_API/message/sendMedia/YOUR_INSTANCE",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"number\": \"{{ $('Check AI Success').item.json.mobile_number }}\",\n  \"mediatype\": \"document\",\n  \"mimetype\": \"application/pdf\",\n  \"caption\": \"🎉 *Your School Happiness Report is Ready!*\\n\\nDear {{ $('Check AI Success').item.json.school_name }} Family,\\n\\nYour detailed comparison with GCM Convent School is here! 📊\\n\\n✨ *Key Highlights:*\\n📈 Happiness Boost: +{{ $('Check AI Success').item.json.happiness_difference }}%\\n🏆 Ranking: #{{ $('Check AI Success').item.json.ranking_improvement }}\\n💯 Total Improvement: {{ $('Check AI Success').item.json.total_improvement }}%\\n\\n{{ $('Check AI Success').item.json.ai_insights.executive_summary }}\\n\\n📄 Check the attached PDF for complete analysis!\\n\\n---\\n🏫 *Join GCM Convent and unlock your full potential!* 🌟\\n\\n📞 Contact: +91-98765-43210\\n🌐 www.gcmconvent.edu.in\",\n  \"media\": \"{{ $json.pdf_url }}\"\n}",
+        "jsonBody": "={\n  \"number\": \"{{ $('Check AI Success').item.json.mobile_number }}\",\n  \"mediatype\": \"document\",\n  \"mimetype\": \"application/pdf\",\n  \"caption\": \"🎉 *Your School Report is Ready!*\\n\\nDear {{ $('Check AI Success').item.json.school_name }} Family,\\n\\n📊 Detailed comparison with GCM Convent\\n📈 Happiness: +{{ $('Check AI Success').item.json.happiness_difference }}%\\n🏆 Ranking: #{{ $('Check AI Success').item.json.ranking_improvement }}\\n💯 Improvement: {{ $('Check AI Success').item.json.total_improvement }}%\\n\\n{{ $('Check AI Success').item.json.ai_insights.executive_summary.substring(0, 200) }}...\\n\\n📄 Full analysis attached!\\n\\n🏫 GCM Convent School\\n📞 +91-98765-43210\",\n  \"media\": \"{{ $json.pdf_url }}\"\n}",
         "options": {}
       },
-      "id": "evolution-whatsapp",
-      "name": "Evolution API WhatsApp",
+      "id": "send-whatsapp",
+      "name": "Send WhatsApp",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2040, 260]
+      "position": [1840, 260],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "YOUR_EVOLUTION_CREDENTIAL_ID",
+          "name": "Evolution API"
+        }
+      }
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={\n  \"success\": true,\n  \"message\": \"Report generated and sent successfully!\",\n  \"school_name\": \"{{ $('Check AI Success').item.json.school_name }}\",\n  \"mobile\": \"{{ $('Check AI Success').item.json.mobile_number }}\",\n  \"pdf_url\": \"{{ $('Apps Script Generate PDF').first().json.pdf_url }}\",\n  \"whatsapp_status\": \"{{ $json.status || 'sent' }}\",\n  \"timestamp\": \"{{ $('Check AI Success').item.json.timestamp }}\",\n  \"ai_models_used\": \"{{ $('Check AI Success').item.json.ai_insights.models_used || 4 }}\",\n  \"retry_count\": \"{{ $('Check AI Success').item.json.retry_count || 0 }}\"\n}",
+        "responseBody": "={\n  \"success\": true,\n  \"message\": \"Report generated successfully!\",\n  \"school_name\": \"{{ $('Check AI Success').item.json.school_name }}\",\n  \"mobile\": \"{{ $('Check AI Success').item.json.mobile_number }}\",\n  \"pdf_url\": \"{{ $('Generate PDF').first().json.pdf_url }}\",\n  \"ai_model\": \"{{ $('Check AI Success').item.json.ai_source_model }}\",\n  \"retry_count\": {{ $('Check AI Success').item.json.retry_count }},\n  \"timestamp\": \"{{ $('Check AI Success').item.json.timestamp }}\"\n}",
         "options": {}
       },
-      "id": "response-node",
+      "id": "response-success",
       "name": "Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [2240, 260]
+      "position": [2040, 260]
     }
   ],
   "pinData": {},
   "connections": {
     "Webhook Trigger": {
-      "main": [
-        [
-          {
-            "node": "Transform Data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Transform Data", "type": "main", "index": 0}]]
     },
     "Transform Data": {
-      "main": [
-        [
-          {
-            "node": "Task 1: Executive Summary",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Task 2: Category Insights",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Task 3: Growth Potential",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Task 4: Recommendation",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[
+        {"node": "AI: Gemini (Primary)", "type": "main", "index": 0},
+        {"node": "AI: Llama (Backup)", "type": "main", "index": 0}
+      ]]
     },
-    "Task 1: Executive Summary": {
-      "main": [
-        [
-          {
-            "node": "AI Model 1: Grok",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "AI: Gemini (Primary)": {
+      "main": [[{"node": "Merge AI Responses", "type": "main", "index": 0}]]
     },
-    "Task 2: Category Insights": {
-      "main": [
-        [
-          {
-            "node": "AI Model 2: Gemini",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "AI: Llama (Backup)": {
+      "main": [[{"node": "Merge AI Responses", "type": "main", "index": 1}]]
     },
-    "Task 3: Growth Potential": {
-      "main": [
-        [
-          {
-            "node": "AI Model 3: Llama",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Task 4: Recommendation": {
-      "main": [
-        [
-          {
-            "node": "AI Model 4: Phi-3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Model 1: Grok": {
-      "main": [
-        [
-          {
-            "node": "Merge AI Results",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "AI Model 2: Gemini": {
-      "main": [
-        [
-          {
-            "node": "Merge AI Results",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "AI Model 3: Llama": {
-      "main": [
-        [
-          {
-            "node": "Merge AI Results",
-            "type": "main",
-            "index": 2
-          }
-        ]
-      ]
-    },
-    "AI Model 4: Phi-3": {
-      "main": [
-        [
-          {
-            "node": "Merge AI Results",
-            "type": "main",
-            "index": 3
-          }
-        ]
-      ]
-    },
-    "Merge AI Results": {
-      "main": [
-        [
-          {
-            "node": "Compile AI Insights",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Merge AI Responses": {
+      "main": [[{"node": "Compile AI Insights", "type": "main", "index": 0}]]
     },
     "Compile AI Insights": {
-      "main": [
-        [
-          {
-            "node": "Check AI Success",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Check AI Success", "type": "main", "index": 0}]]
     },
     "Check AI Success": {
       "main": [
-        [
-          {
-            "node": "Google Sheets Append",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Wait 5 Minutes",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{"node": "Google Sheets", "type": "main", "index": 0}],
+        [{"node": "Check Retry Limit", "type": "main", "index": 0}]
+      ]
+    },
+    "Check Retry Limit": {
+      "main": [
+        [{"node": "Wait 5 Minutes", "type": "main", "index": 0}],
+        [{"node": "Google Sheets", "type": "main", "index": 0}]
       ]
     },
     "Wait 5 Minutes": {
-      "main": [
-        [
-          {
-            "node": "Retry Logic",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{"node": "Increment Retry", "type": "main", "index": 0}]]
     },
-    "Retry Logic": {
-      "main": [
-        [
-          {
-            "node": "Transform Data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Increment Retry": {
+      "main": [[{"node": "Transform Data", "type": "main", "index": 0}]]
     },
-    "Google Sheets Append": {
-      "main": [
-        [
-          {
-            "node": "Apps Script Generate PDF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Google Sheets": {
+      "main": [[{"node": "Generate PDF", "type": "main", "index": 0}]]
     },
-    "Apps Script Generate PDF": {
-      "main": [
-        [
-          {
-            "node": "Evolution API WhatsApp",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Generate PDF": {
+      "main": [[{"node": "Send WhatsApp", "type": "main", "index": 0}]]
     },
-    "Evolution API WhatsApp": {
-      "main": [
-        [
-          {
-            "node": "Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Send WhatsApp": {
+      "main": [[{"node": "Response", "type": "main", "index": 0}]]
     }
   },
   "settings": {
     "executionOrder": "v1"
-  },
-  "staticData": null,
-  "tags": [],
-  "triggerCount": 1,
-  "updatedAt": "2025-12-31T09:08:00.000Z",
-  "versionId": "v2-multi-model"
+  }
 }
