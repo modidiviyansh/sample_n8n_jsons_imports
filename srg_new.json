@@ -1,5 +1,5 @@
 {
-  "name": "School Report - Native AI with Retry",
+  "name": "School Report - Fixed Connections",
   "nodes": [
     {
       "parameters": {
@@ -7,7 +7,7 @@
         "path": "school-report-generate",
         "responseMode": "responseNode"
       },
-      "id": "node-webhook",
+      "id": "webhook-1",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
@@ -15,9 +15,9 @@
     },
     {
       "parameters": {
-        "jsCode": "const inputData = $input.item.json;\nconst body = inputData.body || inputData;\n\nconst formResponses = body.form_responses || [];\nconst schoolName = formResponses.find(q => q.question_number === 1)?.response || \"Unknown School\";\nconst fees = formResponses.find(q => q.question_number === 2)?.response_label || \"Not provided\";\nconst travelTime = formResponses.find(q => q.question_number === 3)?.response || \"Not provided\";\nconst activities = formResponses.find(q => q.question_number === 4)?.selected_activities || [];\nconst hasAC = formResponses.find(q => q.question_number === 5)?.response || \"No\";\nconst classExcitement = formResponses.find(q => q.question_number === 6)?.response || 5;\nconst learningEnv = formResponses.find(q => q.question_number === 7)?.response || 5;\n\nconst categories = [\n  { name: \"Teaching Quality\", our: body.our_score1 || 0, gcm: body.other_score1 || 0, difference: (body.our_score1 || 0) - (body.other_score1 || 0) },\n  { name: \"Facilities\", our: body.our_score2 || 0, gcm: body.other_score2 || 0, difference: (body.our_score2 || 0) - (body.other_score2 || 0) },\n  { name: \"Activities\", our: body.our_score3 || 0, gcm: body.other_score3 || 0, difference: (body.our_score3 || 0) - (body.other_score3 || 0) },\n  { name: \"Environment\", our: body.our_score4 || 0, gcm: body.other_score4 || 0, difference: (body.our_score4 || 0) - (body.other_score4 || 0) },\n  { name: \"Student Support\", our: body.our_score5 || 0, gcm: body.other_score5 || 0, difference: (body.our_score5 || 0) - (body.other_score5 || 0) }\n];\n\nconst categoryText = categories.map(c => `${c.name}: ${c.our}% vs ${c.gcm}% (${c.difference >= 0 ? '+' : ''}${c.difference}%)`).join('\\n');\n\nconst fullContext = `School Comparison Analysis:\n\nCurrent School: ${schoolName}\nCompetitor: GCM Convent School\nBackground: Rural school seeking multi-dimensional excellence\n\nScore Breakdown:\n${categoryText}\n\nOverall: ${schoolName} ${body.overall_score_our || 0}% vs GCM ${body.overall_score_others || 0}%\n\nGrowth Potential:\n- Happiness: +${body.happiness_difference || 0}%\n- Ranking: #${body.ranking_difference || 0}\n- Total Improvement: ${body.total_improvement_difference || 0}%\n\nFamily Context:\n- Fees: ${fees}\n- Travel: ${travelTime}\n- Activities: ${activities.join(', ') || 'Limited'}\n- AC: ${hasAC}\n- Excitement: ${classExcitement}/10\n- Environment: ${learningEnv}/10\n\nKey: Most schools excel in ONE area. GCM excels in ALL dimensions.`;\n\nreturn {\n  timestamp: new Date().toISOString(),\n  school_name: schoolName,\n  comparison_school: body.others_name || \"GCM Convent School\",\n  mobile_number: body.mobile_number,\n  our_school_score: body.overall_score_our || 0,\n  gcm_score: body.overall_score_others || 0,\n  score_difference: (body.overall_score_our || 0) - (body.overall_score_others || 0),\n  categories: categories,\n  categories_text: categoryText,\n  happiness_difference: body.happiness_difference || 0,\n  ranking_improvement: body.ranking_difference || 0,\n  total_improvement: body.total_improvement_difference || 0,\n  fees: fees,\n  travel_time: travelTime,\n  activities: activities.join(\", \"),\n  activities_count: activities.length,\n  has_ac: hasAC,\n  class_excitement: classExcitement,\n  learning_environment: learningEnv,\n  full_context: fullContext,\n  school_type: \"rural\",\n  form_responses: formResponses,\n  retry_count: body.retry_count || 0,\n  max_retries: 3\n};"
+        "jsCode": "const inputData = $input.item.json;\nconst body = inputData.body || inputData;\n\nconst formResponses = body.form_responses || [];\nconst schoolName = formResponses.find(q => q.question_number === 1)?.response || \"Unknown School\";\nconst fees = formResponses.find(q => q.question_number === 2)?.response_label || \"Not provided\";\nconst travelTime = formResponses.find(q => q.question_number === 3)?.response || \"Not provided\";\nconst activities = formResponses.find(q => q.question_number === 4)?.selected_activities || [];\nconst hasAC = formResponses.find(q => q.question_number === 5)?.response || \"No\";\nconst classExcitement = formResponses.find(q => q.question_number === 6)?.response || 5;\nconst learningEnv = formResponses.find(q => q.question_number === 7)?.response || 5;\n\nconst categories = [\n  { name: \"Teaching Quality\", our: body.our_score1 || 0, gcm: body.other_score1 || 0, difference: (body.our_score1 || 0) - (body.other_score1 || 0) },\n  { name: \"Facilities\", our: body.our_score2 || 0, gcm: body.other_score2 || 0, difference: (body.our_score2 || 0) - (body.other_score2 || 0) },\n  { name: \"Activities\", our: body.our_score3 || 0, gcm: body.other_score3 || 0, difference: (body.our_score3 || 0) - (body.other_score3 || 0) },\n  { name: \"Environment\", our: body.our_score4 || 0, gcm: body.other_score4 || 0, difference: (body.our_score4 || 0) - (body.other_score4 || 0) },\n  { name: \"Student Support\", our: body.our_score5 || 0, gcm: body.other_score5 || 0, difference: (body.our_score5 || 0) - (body.other_score5 || 0) }\n];\n\nconst categoryText = categories.map(c => `${c.name}: ${c.our}% vs ${c.gcm}% (${c.difference >= 0 ? '+' : ''}${c.difference}%)`).join('\\n');\n\nconst fullContext = `School Comparison Analysis:\n\nCurrent School: ${schoolName}\nCompetitor: GCM Convent School\n\nScore Breakdown:\n${categoryText}\n\nOverall: ${schoolName} ${body.overall_score_our || 0}% vs GCM ${body.overall_score_others || 0}%\n\nGrowth Potential:\n- Happiness: +${body.happiness_difference || 0}%\n- Ranking: #${body.ranking_difference || 0}\n- Total Improvement: ${body.total_improvement_difference || 0}%\n\nFamily Context:\n- Fees: ${fees}\n- Travel: ${travelTime}\n- Activities: ${activities.join(', ') || 'Limited'}\n- AC: ${hasAC}\n- Excitement: ${classExcitement}/10\n- Environment: ${learningEnv}/10\n\nKey: GCM excels in ALL dimensions.`;\n\nreturn {\n  timestamp: new Date().toISOString(),\n  school_name: schoolName,\n  comparison_school: body.others_name || \"GCM Convent School\",\n  mobile_number: body.mobile_number,\n  our_school_score: body.overall_score_our || 0,\n  gcm_score: body.overall_score_others || 0,\n  score_difference: (body.overall_score_our || 0) - (body.overall_score_others || 0),\n  categories: categories,\n  categories_text: categoryText,\n  happiness_difference: body.happiness_difference || 0,\n  ranking_improvement: body.ranking_difference || 0,\n  total_improvement: body.total_improvement_difference || 0,\n  fees: fees,\n  travel_time: travelTime,\n  activities: activities.join(\", \"),\n  activities_count: activities.length,\n  has_ac: hasAC,\n  class_excitement: classExcitement,\n  learning_environment: learningEnv,\n  full_context: fullContext,\n  form_responses: formResponses,\n  retry_count: body.retry_count || 0,\n  max_retries: 3\n};"
       },
-      "id": "node-transform",
+      "id": "transform-1",
       "name": "Transform Data",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -35,14 +35,14 @@
             },
             {
               "id": "a2",
-              "name": "prompt_text",
-              "value": "=You are an empathetic educational consultant for rural Indian schools.\n\nContext: {{ $json.full_context }}\n\nWrite a warm 3-4 sentence executive summary that:\n1. Acknowledges {{ $json.school_name }}'s strengths\n2. Highlights GCM Convent's multi-dimensional advantage\n3. Provides professional yet hopeful assessment\n\nProvide ONLY the summary, no labels.",
+              "name": "ai_prompt",
+              "value": "=You are an empathetic educational consultant for rural Indian schools.\n\nContext:\n{{ $json.full_context }}\n\nTask: Write a warm 3-4 sentence executive summary that:\n1. Acknowledges {{ $json.school_name }}'s current strengths\n2. Highlights GCM Convent's multi-dimensional advantage (excels in ALL areas)\n3. Provides professional yet hopeful assessment\n\nTone: Warm, professional, encouraging.\n\nProvide ONLY the summary text, no extra formatting.",
               "type": "string"
             }
           ]
         }
       },
-      "id": "node-task1",
+      "id": "task1-1",
       "name": "Task 1 Setup",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.3,
@@ -60,14 +60,14 @@
             },
             {
               "id": "a2",
-              "name": "prompt_text",
-              "value": "=Educational analyst task.\n\nContext: {{ $json.full_context }}\n\nProvide exactly 5 insights (one per line):\n1. Teaching Quality ({{ $json.categories[0].our }}% vs {{ $json.categories[0].gcm }}%)\n2. Facilities ({{ $json.categories[1].our }}% vs {{ $json.categories[1].gcm }}%)\n3. Activities ({{ $json.categories[2].our }}% vs {{ $json.categories[2].gcm }}%)\n4. Environment ({{ $json.categories[3].our }}% vs {{ $json.categories[3].gcm }}%)\n5. Student Support ({{ $json.categories[4].our }}% vs {{ $json.categories[4].gcm }}%)\n\nOne sentence each. Start with category name.",
+              "name": "ai_prompt",
+              "value": "=You are an educational analyst.\n\nContext:\n{{ $json.full_context }}\n\nTask: Provide exactly 5 specific insights (one per line):\n\n1. Teaching Quality ({{ $json.categories[0].our }}% vs {{ $json.categories[0].gcm }}%): [observation]\n2. Facilities ({{ $json.categories[1].our }}% vs {{ $json.categories[1].gcm }}%): [observation]\n3. Activities ({{ $json.categories[2].our }}% vs {{ $json.categories[2].gcm }}%): [observation]\n4. Environment ({{ $json.categories[3].our }}% vs {{ $json.categories[3].gcm }}%): [observation]\n5. Student Support ({{ $json.categories[4].our }}% vs {{ $json.categories[4].gcm }}%): [observation]\n\nFormat: Each on new line. One sentence each.\n\nProvide ONLY the 5 insights.",
               "type": "string"
             }
           ]
         }
       },
-      "id": "node-task2",
+      "id": "task2-1",
       "name": "Task 2 Setup",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.3,
@@ -85,14 +85,14 @@
             },
             {
               "id": "a2",
-              "name": "prompt_text",
-              "value": "=Inspiring educational consultant.\n\nContext: {{ $json.full_context }}\n\nWrite 2-3 inspiring sentences about transformation at GCM:\n- Emphasize {{ $json.happiness_difference }}% happiness increase\n- Connect to comprehensive development\n- Show lasting impact\n\nMake parents visualize their child thriving.",
+              "name": "ai_prompt",
+              "value": "=You are an inspiring educational consultant.\n\nContext:\n{{ $json.full_context }}\n\nTask: Write 2-3 inspiring sentences about transformation at GCM that:\n- Emphasizes {{ $json.happiness_difference }}% happiness increase\n- Connects to comprehensive development\n- Shows lasting impact\n\nTone: Inspiring, hopeful, emotionally resonant.\n\nProvide ONLY the growth potential text.",
               "type": "string"
             }
           ]
         }
       },
-      "id": "node-task3",
+      "id": "task3-1",
       "name": "Task 3 Setup",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.3,
@@ -110,14 +110,14 @@
             },
             {
               "id": "a2",
-              "name": "prompt_text",
-              "value": "=Practical education advisor.\n\nFamily: Fees {{ $json.fees }}, Travel {{ $json.travel_time }}, Excitement {{ $json.class_excitement }}/10\n\nProvide 2 sentences:\n1. Why GCM fits their constraints\n2. The {{ $json.total_improvement }}% value gained\n\nBe specific and practical.",
+              "name": "ai_prompt",
+              "value": "=You are a practical education advisor.\n\nFamily Context:\n- Fees: {{ $json.fees }}\n- Travel: {{ $json.travel_time }}\n- Student Excitement: {{ $json.class_excitement }}/10\n- Environment Rating: {{ $json.learning_environment }}/10\n- Potential Improvement: {{ $json.total_improvement }}%\n\nTask: Provide exactly 2 clear sentences:\n1. Why GCM fits their practical constraints (fees, travel)\n2. The measurable {{ $json.total_improvement }}% value gained\n\nTone: Practical, specific, confident.\n\nProvide ONLY the 2 sentences.",
               "type": "string"
             }
           ]
         }
       },
-      "id": "node-task4",
+      "id": "task4-1",
       "name": "Task 4 Setup",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.3,
@@ -125,25 +125,32 @@
     },
     {
       "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gemini-2.0-flash-exp",
-          "mode": "list",
-          "cachedResultName": "Gemini 2.0 Flash Experimental"
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={{ $credentials.googleAiApi.apiKey }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
         },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": {{ JSON.stringify($json.ai_prompt) }}\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.7,\n    \"maxOutputTokens\": 500\n  }\n}",
         "options": {
-          "temperature": 0.7,
-          "maxOutputTokens": 500
+          "timeout": 30000
         }
       },
-      "id": "node-ai1",
+      "id": "ai1-1",
       "name": "AI Gemini 1",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [840, 400],
       "credentials": {
         "googleAiApi": {
-          "id": "YOUR_GOOGLE_AI_CREDENTIAL_ID",
+          "id": "YOUR_GOOGLE_AI_CREDENTIAL",
           "name": "Google AI"
         }
       },
@@ -151,25 +158,32 @@
     },
     {
       "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gemini-2.0-flash-exp",
-          "mode": "list",
-          "cachedResultName": "Gemini 2.0 Flash Experimental"
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={{ $credentials.googleAiApi.apiKey }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
         },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": {{ JSON.stringify($json.ai_prompt) }}\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.7,\n    \"maxOutputTokens\": 800\n  }\n}",
         "options": {
-          "temperature": 0.7,
-          "maxOutputTokens": 800
+          "timeout": 30000
         }
       },
-      "id": "node-ai2",
+      "id": "ai2-1",
       "name": "AI Gemini 2",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [840, 600],
       "credentials": {
         "googleAiApi": {
-          "id": "YOUR_GOOGLE_AI_CREDENTIAL_ID",
+          "id": "YOUR_GOOGLE_AI_CREDENTIAL",
           "name": "Google AI"
         }
       },
@@ -177,25 +191,32 @@
     },
     {
       "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "gemini-2.0-flash-exp",
-          "mode": "list",
-          "cachedResultName": "Gemini 2.0 Flash Experimental"
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={{ $credentials.googleAiApi.apiKey }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
         },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": {{ JSON.stringify($json.ai_prompt) }}\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.8,\n    \"maxOutputTokens\": 500\n  }\n}",
         "options": {
-          "temperature": 0.8,
-          "maxOutputTokens": 500
+          "timeout": 30000
         }
       },
-      "id": "node-ai3",
+      "id": "ai3-1",
       "name": "AI Gemini 3",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [840, 800],
       "credentials": {
         "googleAiApi": {
-          "id": "YOUR_GOOGLE_AI_CREDENTIAL_ID",
+          "id": "YOUR_GOOGLE_AI_CREDENTIAL",
           "name": "Google AI"
         }
       },
@@ -203,21 +224,38 @@
     },
     {
       "parameters": {
-        "model": "google/gemini-2.0-flash-exp:free",
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "HTTP-Referer",
+              "value": "https://school.theupliftco.com"
+            },
+            {
+              "name": "X-Title",
+              "value": "GCM School Report"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/gemini-2.0-flash-exp:free\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a practical education advisor. Provide specific recommendations.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify($json.ai_prompt) }}\n    }\n  ],\n  \"temperature\": 0.7,\n  \"max_tokens\": 400\n}",
         "options": {
-          "baseURL": "https://openrouter.ai/api/v1",
-          "temperature": 0.7,
-          "maxTokens": 400
+          "timeout": 30000
         }
       },
-      "id": "node-ai4",
+      "id": "ai4-1",
       "name": "AI OpenRouter 4",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [840, 1000],
       "credentials": {
-        "openAiApi": {
-          "id": "YOUR_OPENROUTER_CREDENTIAL_ID",
+        "httpHeaderAuth": {
+          "id": "YOUR_OPENROUTER_CREDENTIAL",
           "name": "OpenRouter"
         }
       },
@@ -225,50 +263,62 @@
     },
     {
       "parameters": {
-        "mode": "combine",
-        "combinationMode": "mergeByPosition"
+        "jsCode": "const response = $input.item.json;\nconst taskData = $('Task 1 Setup').item.json;\n\nlet aiOutput = '';\n\nif (response && response.candidates && response.candidates[0]) {\n  const content = response.candidates[0].content;\n  if (content && content.parts && content.parts[0]) {\n    aiOutput = content.parts[0].text;\n  }\n}\n\nif (!aiOutput && response.error) {\n  aiOutput = '';\n}\n\nreturn {\n  ...taskData,\n  response: aiOutput.trim(),\n  output: aiOutput.trim(),\n  text: aiOutput.trim(),\n  ai_success: aiOutput.length > 0\n};"
       },
-      "id": "node-merge",
-      "name": "Merge AI Outputs",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 2.1,
+      "id": "extract1-1",
+      "name": "Extract Gemini 1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1040, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.item.json;\nconst taskData = $('Task 2 Setup').item.json;\n\nlet aiOutput = '';\n\nif (response && response.candidates && response.candidates[0]) {\n  const content = response.candidates[0].content;\n  if (content && content.parts && content.parts[0]) {\n    aiOutput = content.parts[0].text;\n  }\n}\n\nif (!aiOutput && response.error) {\n  aiOutput = '';\n}\n\nreturn {\n  ...taskData,\n  response: aiOutput.trim(),\n  output: aiOutput.trim(),\n  text: aiOutput.trim(),\n  ai_success: aiOutput.length > 0\n};"
+      },
+      "id": "extract2-1",
+      "name": "Extract Gemini 2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [1040, 600]
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst originalData = $('Transform Data').first().json;\n\nconst aiInsights = {\n  executive_summary: '',\n  category_insights: [],\n  growth_potential: '',\n  personalized_recommendation: '',\n  generation_method: 'ai',\n  models_used: 0\n};\n\nitems.forEach(item => {\n  const taskType = item.json.task_type;\n  const output = item.json.response || item.json.output || item.json.text || '';\n  \n  if (!output) return;\n  \n  aiInsights.models_used++;\n  \n  switch(taskType) {\n    case 'executive_summary':\n      aiInsights.executive_summary = output.trim();\n      break;\n    case 'category_insights':\n      const insights = output.split('\\n')\n        .filter(line => line.trim().length > 20)\n        .map(line => line.trim())\n        .filter(line => \n          line.match(/^[0-9\\.\\-\\*•]/) || \n          line.includes('Teaching') || \n          line.includes('Facilities') || \n          line.includes('Activities') || \n          line.includes('Environment') || \n          line.includes('Support')\n        );\n      aiInsights.category_insights = insights.slice(0, 5);\n      break;\n    case 'growth_potential':\n      aiInsights.growth_potential = output.trim();\n      break;\n    case 'recommendation':\n      aiInsights.personalized_recommendation = output.trim();\n      break;\n  }\n});\n\nif (!aiInsights.executive_summary) {\n  aiInsights.executive_summary = `${originalData.school_name} shows solid foundations. GCM Convent offers comprehensive excellence across all dimensions - teaching, facilities, activities, environment, and support. Unlike most schools excelling in one area, GCM's multi-dimensional approach creates lasting student success.`;\n  aiInsights.generation_method = 'fallback';\n}\n\nif (!aiInsights.category_insights || aiInsights.category_insights.length < 5) {\n  aiInsights.category_insights = [\n    `Teaching Quality: ${originalData.categories[0].our}% vs ${originalData.categories[0].gcm}% - GCM offers advanced methods and smaller classes.`,\n    `Facilities: ${originalData.categories[1].our}% vs ${originalData.categories[1].gcm}% - GCM provides state-of-the-art labs and infrastructure.`,\n    `Activities: ${originalData.activities_count} activities vs GCM's 12+ options for holistic development.`,\n    `Environment: GCM's ${originalData.categories[3].gcm}% reflects AC classrooms and inspiring spaces.`,\n    `Student Support: ${originalData.categories[4].gcm}% shows personalized mentoring and counseling.`\n  ];\n}\n\nif (!aiInsights.growth_potential) {\n  aiInsights.growth_potential = `At GCM, students experience ${originalData.happiness_difference}% happiness increase. Comprehensive development across academics, activities, and support creates measurable improvements in well-being and success.`;\n}\n\nif (!aiInsights.personalized_recommendation) {\n  aiInsights.personalized_recommendation = `With ${originalData.travel_time} commute and ${originalData.fees} fees, GCM is well-positioned. The ${originalData.total_improvement}% improvement represents meaningful investment in comprehensive education.`;\n}\n\nreturn {\n  ...originalData,\n  ai_insights: aiInsights,\n  processing_status: `Generated using ${aiInsights.models_used} AI models`\n};"
+        "jsCode": "const response = $input.item.json;\nconst taskData = $('Task 3 Setup').item.json;\n\nlet aiOutput = '';\n\nif (response && response.candidates && response.candidates[0]) {\n  const content = response.candidates[0].content;\n  if (content && content.parts && content.parts[0]) {\n    aiOutput = content.parts[0].text;\n  }\n}\n\nif (!aiOutput && response.error) {\n  aiOutput = '';\n}\n\nreturn {\n  ...taskData,\n  response: aiOutput.trim(),\n  output: aiOutput.trim(),\n  text: aiOutput.trim(),\n  ai_success: aiOutput.length > 0\n};"
       },
-      "id": "node-compile",
-      "name": "Compile Insights",
+      "id": "extract3-1",
+      "name": "Extract Gemini 3",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
+      "position": [1040, 800]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.item.json;\nconst taskData = $('Task 4 Setup').item.json;\n\nlet aiOutput = '';\n\nif (response && response.choices && response.choices[0]) {\n  const message = response.choices[0].message;\n  if (message && message.content) {\n    aiOutput = message.content;\n  }\n}\n\nif (!aiOutput && response.error) {\n  aiOutput = '';\n}\n\nreturn {\n  ...taskData,\n  response: aiOutput.trim(),\n  output: aiOutput.trim(),\n  text: aiOutput.trim(),\n  ai_success: aiOutput.length > 0\n};"
+      },
+      "id": "extract4-1",
+      "name": "Extract OpenRouter 4",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1040, 1000]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition"
+      },
+      "id": "merge-1",
+      "name": "Merge AI Outputs",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
       "position": [1240, 600]
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "c1",
-              "leftValue": "={{ $json.ai_insights.generation_method }}",
-              "rightValue": "fallback",
-              "operator": {
-                "type": "string",
-                "operation": "notEquals"
-              }
-            }
-          ],
-          "combinator": "and"
-        }
+        "jsCode": "const items = $input.all();\nconst originalData = $('Transform Data').first().json;\n\nconst aiInsights = {\n  executive_summary: '',\n  category_insights: [],\n  growth_potential: '',\n  personalized_recommendation: '',\n  generation_method: 'ai',\n  models_used: 0\n};\n\nitems.forEach(item => {\n  const taskType = item.json.task_type;\n  const output = item.json.response || item.json.output || item.json.text || '';\n  const success = item.json.ai_success;\n  \n  if (!output || !success) return;\n  \n  aiInsights.models_used++;\n  \n  switch(taskType) {\n    case 'executive_summary':\n      aiInsights.executive_summary = output.trim();\n      break;\n    case 'category_insights':\n      const insights = output.split('\\n')\n        .filter(line => line.trim().length > 20)\n        .map(line => line.trim())\n        .filter(line => \n          line.match(/^[0-9\\.\\-\\*•]/) || \n          line.toLowerCase().includes('teaching') || \n          line.toLowerCase().includes('facilities') || \n          line.toLowerCase().includes('activities') || \n          line.toLowerCase().includes('environment') || \n          line.toLowerCase().includes('support')\n        );\n      aiInsights.category_insights = insights.slice(0, 5);\n      break;\n    case 'growth_potential':\n      aiInsights.growth_potential = output.trim();\n      break;\n    case 'recommendation':\n      aiInsights.personalized_recommendation = output.trim();\n      break;\n  }\n});\n\nif (!aiInsights.executive_summary) {\n  aiInsights.executive_summary = `${originalData.school_name} demonstrates solid foundations. GCM Convent School offers comprehensive excellence across teaching, facilities, activities, environment, and support. Unlike schools excelling in one area, GCM's multi-dimensional approach creates lasting student success.`;\n  aiInsights.generation_method = 'fallback';\n}\n\nif (!aiInsights.category_insights || aiInsights.category_insights.length < 5) {\n  aiInsights.category_insights = [\n    `Teaching Quality: ${originalData.categories[0].our}% vs ${originalData.categories[0].gcm}% - GCM offers advanced pedagogical methods and smaller class sizes.`,\n    `Facilities: ${originalData.categories[1].our}% vs ${originalData.categories[1].gcm}% - GCM provides state-of-the-art science labs and modern infrastructure.`,\n    `Activities: ${originalData.activities_count} activities vs GCM's 12+ options including swimming, robotics, and performing arts.`,\n    `Environment: GCM's ${originalData.categories[3].gcm}% score reflects AC classrooms and inspiring learning spaces.`,\n    `Student Support: ${originalData.categories[4].gcm}% demonstrates personalized mentoring and professional counseling services.`\n  ];\n}\n\nif (!aiInsights.growth_potential) {\n  aiInsights.growth_potential = `At GCM, students experience ${originalData.happiness_difference}% happiness increase through comprehensive development across academics, activities, and support systems.`;\n}\n\nif (!aiInsights.personalized_recommendation) {\n  aiInsights.personalized_recommendation = `With ${originalData.travel_time} commute and ${originalData.fees} fees, GCM is well-positioned. The ${originalData.total_improvement}% improvement represents meaningful investment in comprehensive education.`;\n}\n\nreturn {\n  ...originalData,\n  ai_insights: aiInsights,\n  processing_status: `Generated using ${aiInsights.models_used}/4 AI models`\n};"
       },
-      "id": "node-check",
-      "name": "Check AI Success",
-      "type": "n8n-nodes-base.if",
+      "id": "compile-1",
+      "name": "Compile Insights",
+      "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [1440, 600]
     },
@@ -276,10 +326,30 @@
       "parameters": {
         "conditions": {
           "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
+            "caseSensitive": false
           },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.ai_insights.models_used }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "largerEqual"
+              }
+            }
+          ]
+        }
+      },
+      "id": "check-1",
+      "name": "Check AI Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1640, 600]
+    },
+    {
+      "parameters": {
+        "conditions": {
           "conditions": [
             {
               "id": "c2",
@@ -290,36 +360,36 @@
                 "operation": "smaller"
               }
             }
-          ],
-          "combinator": "and"
+          ]
         }
       },
-      "id": "node-retry-check",
+      "id": "retry-check-1",
       "name": "Check Retry Limit",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1640, 800]
+      "position": [1840, 800]
     },
     {
       "parameters": {
-        "amount": 5,
+        "amount": 2,
         "unit": "minutes"
       },
-      "id": "node-wait",
-      "name": "Wait 5 Minutes",
+      "id": "wait-1",
+      "name": "Wait 2 Minutes",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1840, 900]
+      "position": [2040, 900],
+      "webhookId": "wait-webhook-id"
     },
     {
       "parameters": {
-        "jsCode": "const data = $input.first().json;\ndata.retry_count = (data.retry_count || 0) + 1;\ndata.processing_status = `Retry ${data.retry_count}/${data.max_retries}`;\nreturn data;"
+        "jsCode": "const data = $input.first().json;\ndata.retry_count = (data.retry_count || 0) + 1;\ndata.processing_status = `Retry ${data.retry_count}/${data.max_retries}`;\nreturn { body: data };"
       },
-      "id": "node-increment",
+      "id": "increment-1",
       "name": "Increment Retry",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2040, 900]
+      "position": [2240, 900]
     },
     {
       "parameters": {
@@ -342,27 +412,32 @@
             "Mobile": "={{ $json.mobile_number }}",
             "Our_Score": "={{ $json.our_school_score }}",
             "GCM_Score": "={{ $json.gcm_score }}",
-            "Happiness_Diff": "={{ $json.happiness_difference }}",
+            "Happiness": "={{ $json.happiness_difference }}",
             "Ranking": "={{ $json.ranking_improvement }}",
-            "Total_Improvement": "={{ $json.total_improvement }}",
+            "Improvement": "={{ $json.total_improvement }}",
             "Executive_Summary": "={{ $json.ai_insights.executive_summary }}",
-            "Growth_Potential": "={{ $json.ai_insights.growth_potential }}",
+            "Insight_1": "={{ $json.ai_insights.category_insights[0] }}",
+            "Insight_2": "={{ $json.ai_insights.category_insights[1] }}",
+            "Insight_3": "={{ $json.ai_insights.category_insights[2] }}",
+            "Insight_4": "={{ $json.ai_insights.category_insights[3] }}",
+            "Insight_5": "={{ $json.ai_insights.category_insights[4] }}",
+            "Growth": "={{ $json.ai_insights.growth_potential }}",
             "Recommendation": "={{ $json.ai_insights.personalized_recommendation }}",
             "AI_Method": "={{ $json.ai_insights.generation_method }}",
             "Models_Used": "={{ $json.ai_insights.models_used }}",
-            "Retry_Count": "={{ $json.retry_count }}",
-            "Status": "Pending PDF"
+            "Retries": "={{ $json.retry_count }}",
+            "Status": "Complete"
           }
         }
       },
-      "id": "node-sheets",
+      "id": "sheets-1",
       "name": "Google Sheets",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.4,
-      "position": [1640, 400],
+      "position": [1840, 400],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "YOUR_SHEETS_CREDENTIAL_ID",
+          "id": "YOUR_SHEETS_CREDENTIAL",
           "name": "Google Sheets"
         }
       }
@@ -378,11 +453,11 @@
           "timeout": 60000
         }
       },
-      "id": "node-pdf",
+      "id": "pdf-1",
       "name": "Generate PDF",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1840, 400]
+      "position": [2040, 400]
     },
     {
       "parameters": {
@@ -392,30 +467,30 @@
         "nodeCredentialType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  \"number\": $('Check AI Success').item.json.mobile_number,\n  \"mediatype\": \"document\",\n  \"mimetype\": \"application/pdf\",\n  \"caption\": \"🎉 School Report Ready!\\n\\nDear \" + $('Check AI Success').item.json.school_name + \" Family,\\n\\nYour GCM comparison is complete! 📊\\n\\n📈 Happiness: +\" + $('Check AI Success').item.json.happiness_difference + \"%\\n🏆 Ranking: #\" + $('Check AI Success').item.json.ranking_improvement + \"\\n💯 Improvement: \" + $('Check AI Success').item.json.total_improvement + \"%\\n\\n\" + $('Check AI Success').item.json.ai_insights.executive_summary.substring(0, 150) + \"...\\n\\n📄 Full PDF attached!\\n\\n🏫 GCM Convent School\\n📞 +91-98765-43210\\n🌐 www.gcmconvent.edu.in\",\n  \"media\": $json.pdf_url\n} }}"
+        "jsonBody": "={{ {\n  \"number\": $('Check AI Success').item.json.mobile_number,\n  \"mediatype\": \"document\",\n  \"mimetype\": \"application/pdf\",\n  \"caption\": \"🎉 School Report Ready!\\n\\nDear \" + $('Check AI Success').item.json.school_name + \" Family,\\n\\nYour GCM comparison:\\n📈 +\" + $('Check AI Success').item.json.happiness_difference + \"% happiness\\n🏆 #\" + $('Check AI Success').item.json.ranking_improvement + \" ranking\\n💯 \" + $('Check AI Success').item.json.total_improvement + \"% improvement\\n\\n📄 PDF attached!\\n\\n🏫 GCM Convent\\n📞 +91-98765-43210\",\n  \"media\": $json.pdf_url\n} }}"
       },
-      "id": "node-whatsapp",
+      "id": "whatsapp-1",
       "name": "Send WhatsApp",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2040, 400],
+      "position": [2240, 400],
       "credentials": {
         "httpHeaderAuth": {
-          "id": "YOUR_EVOLUTION_CREDENTIAL_ID",
-          "name": "Evolution API"
+          "id": "YOUR_EVOLUTION_CREDENTIAL",
+          "name": "Evolution"
         }
       }
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ {\n  \"success\": true,\n  \"school_name\": $('Check AI Success').item.json.school_name,\n  \"mobile\": $('Check AI Success').item.json.mobile_number,\n  \"pdf_url\": $('Generate PDF').first().json.pdf_url,\n  \"ai_method\": $('Check AI Success').item.json.ai_insights.generation_method,\n  \"models_used\": $('Check AI Success').item.json.ai_insights.models_used,\n  \"retry_count\": $('Check AI Success').item.json.retry_count,\n  \"timestamp\": $('Check AI Success').item.json.timestamp\n} }}"
+        "responseBody": "={{ {\n  \"success\": true,\n  \"school\": $('Check AI Success').item.json.school_name,\n  \"mobile\": $('Check AI Success').item.json.mobile_number,\n  \"pdf_url\": $('Generate PDF').first().json.pdf_url,\n  \"ai_method\": $('Check AI Success').item.json.ai_insights.generation_method,\n  \"models_used\": $('Check AI Success').item.json.ai_insights.models_used,\n  \"retries\": $('Check AI Success').item.json.retry_count,\n  \"timestamp\": $('Check AI Success').item.json.timestamp\n} }}"
       },
-      "id": "node-response",
+      "id": "response-1",
       "name": "Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [2240, 400]
+      "position": [2440, 400]
     }
   ],
   "connections": {
@@ -443,15 +518,27 @@
       "main": [[{"node": "AI OpenRouter 4", "type": "main", "index": 0}]]
     },
     "AI Gemini 1": {
-      "main": [[{"node": "Merge AI Outputs", "type": "main", "index": 0}]]
+      "main": [[{"node": "Extract Gemini 1", "type": "main", "index": 0}]]
     },
     "AI Gemini 2": {
-      "main": [[{"node": "Merge AI Outputs", "type": "main", "index": 1}]]
+      "main": [[{"node": "Extract Gemini 2", "type": "main", "index": 0}]]
     },
     "AI Gemini 3": {
-      "main": [[{"node": "Merge AI Outputs", "type": "main", "index": 2}]]
+      "main": [[{"node": "Extract Gemini 3", "type": "main", "index": 0}]]
     },
     "AI OpenRouter 4": {
+      "main": [[{"node": "Extract OpenRouter 4", "type": "main", "index": 0}]]
+    },
+    "Extract Gemini 1": {
+      "main": [[{"node": "Merge AI Outputs", "type": "main", "index": 0}]]
+    },
+    "Extract Gemini 2": {
+      "main": [[{"node": "Merge AI Outputs", "type": "main", "index": 1}]]
+    },
+    "Extract Gemini 3": {
+      "main": [[{"node": "Merge AI Outputs", "type": "main", "index": 2}]]
+    },
+    "Extract OpenRouter 4": {
       "main": [[{"node": "Merge AI Outputs", "type": "main", "index": 3}]]
     },
     "Merge AI Outputs": {
@@ -468,11 +555,11 @@
     },
     "Check Retry Limit": {
       "main": [
-        [{"node": "Wait 5 Minutes", "type": "main", "index": 0}],
+        [{"node": "Wait 2 Minutes", "type": "main", "index": 0}],
         [{"node": "Google Sheets", "type": "main", "index": 0}]
       ]
     },
-    "Wait 5 Minutes": {
+    "Wait 2 Minutes": {
       "main": [[{"node": "Increment Retry", "type": "main", "index": 0}]]
     },
     "Increment Retry": {
